@@ -28,3 +28,6 @@ pnpm-debug.log*
 
 # wrangler dev writes a local miniflare cache here
 .wrangler/
+
+# local Claude Code settings
+.claude/settings.local.json
