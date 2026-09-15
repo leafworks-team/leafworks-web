@@ -56,7 +56,9 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: ${{ steps.deploy.outputs.deployment-url }}
+      # wrangler-action reports a custom domain as "leafworks.dev (custom domain)",
+      # which GitHub rejects as a URL — state the real address instead.
+      url: https://leafworks.dev
     steps:
       - uses: actions/checkout@v7
 
