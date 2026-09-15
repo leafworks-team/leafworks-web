@@ -13,9 +13,19 @@ interface Props {
   description?: string;
   /** Home opens on dark branding sections; content pages start light. */
   navTheme?: 'dark' | 'light';
+  /** Link-preview image in public/, 1200×630. App pages pass their own. */
+  ogImage?: string;
+  ogImageAlt?: string;
 }
 
-const { locale, route, navTheme = 'light' } = Astro.props;
+const {
+  locale,
+  route,
+  navTheme = 'light',
+  ogImage = '/og/leafworks.png',
+  ogImageAlt = 'Leafworks — Tools we wanted. Made for everyone.',
+} = Astro.props;
+const ogImageUrl = new URL(ogImage, Astro.site).toString();
 const t = getContent(locale);
 const title = Astro.props.title ? `${Astro.props.title} — Leafworks` : t.meta.title;
 const description = Astro.props.description ?? t.meta.description;
@@ -49,7 +59,16 @@ const xDefault = new URL(localizedPath(route, DEFAULT_LOCALE), Astro.site).toStr
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content={HTML_LANG[locale]} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
   </head>
   <body>
     <Nav locale={locale} route={route} theme={navTheme} />

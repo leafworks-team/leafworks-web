@@ -30,6 +30,8 @@ const info = [
   route={{ key: 'app', slug: app.slug }}
   title={app.name}
   description={app.tagline[locale]}
+  ogImage={`/og/${app.slug}.png`}
+  ogImageAlt={`${app.name} — ${app.tagline.en}`}
 >
   <section class="app-hero theme-light">
     <div class="container app-hero__inner">
@@ -135,6 +137,8 @@ const info = [
   .app-hero__icon {
     width: 10rem;
     height: 10rem;
+    aspect-ratio: 1;
+    flex: none;
     border-radius: 22.5%;
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08), 0 16px 40px rgba(0, 0, 0, 0.1);
   }
@@ -256,5 +260,16 @@ const info = [
   .app-info__row a:hover {
     text-decoration: underline;
     text-underline-offset: 3px;
+  }
+
+  @media (max-width: 47.99rem) {
+    .app-hero__title {
+      gap: 1.5rem;
+    }
+
+    .app-hero__icon {
+      width: 7.5rem;
+      height: 7.5rem;
+    }
   }
 </style>
