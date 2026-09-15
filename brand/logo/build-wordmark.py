@@ -2,7 +2,9 @@ import sys, uharfbuzz as hb
 from fontTools.ttLib import TTFont
 from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.transformPen import TransformPen
-FONTS = "/Users/imtae/Library/Fonts"
+import os
+# Directory holding PretendardJP-*.otf. Defaults to the macOS user font folder.
+FONTS = os.environ.get("PRETENDARD_DIR", os.path.expanduser("~/Library/Fonts"))
 def wordmark(style, text="Leafworks", tracking=0):
     path = f"{FONTS}/PretendardJP-{style}.otf"
     blob = hb.Blob.from_file_path(path); face = hb.Face(blob); font = hb.Font(face)

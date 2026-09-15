@@ -125,7 +125,7 @@ export const APPS: App[] = [
     ],
     platforms: ['macOS', 'Windows'],
     status: 'in-development',
-    // Repository is private (Im-Tae/LayerDeck) and has no homepage yet.
+    // No public repository or homepage yet — the page shows "not public yet".
   },
 ];
 
