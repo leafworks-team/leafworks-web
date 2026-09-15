@@ -96,6 +96,27 @@ const grid = [
   </section>
 
   <div class="container guide">
+    <!-- Phones: a sticky bar naming the current chapter that expands into the list. -->
+    <details class="toc-mobile" data-toc-mobile>
+      <summary>
+        <span class="toc-mobile__label">{g.toc.label}</span>
+        <span class="toc-mobile__current" data-toc-current>01 {sections[0].label}</span>
+        <span class="toc-mobile__chevron" aria-hidden="true"></span>
+      </summary>
+      <ol>
+        {
+          sections.map((s, i) => (
+            <li>
+              <a href={`#${s.id}`} data-toc={s.id} data-toc-label={`${String(i + 1).padStart(2, '0')} ${s.label}`}>
+                <span class="toc__num">{String(i + 1).padStart(2, '0')}</span>
+                {s.label}
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </details>
+
     <nav class="toc" aria-label={g.toc.label}>
       <ol>
         {
@@ -457,22 +478,38 @@ const grid = [
 </BaseLayout>
 
 <script>
-  // Highlight the table-of-contents entry for the chapter in view.
-  const links = new Map(
-    [...document.querySelectorAll<HTMLAnchorElement>('[data-toc]')].map((a) => [a.dataset.toc!, a])
-  );
+  // Highlight the table-of-contents entry for the chapter in view. Each chapter
+  // has two links — the desktop side list and the phone dropdown — so mark both.
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc]')];
+  const mobile = document.querySelector<HTMLDetailsElement>('[data-toc-mobile]');
+  const current = document.querySelector<HTMLElement>('[data-toc-current]');
+
+  const setCurrent = (id: string) => {
+    for (const a of links) {
+      if (a.dataset.toc === id) {
+        a.setAttribute('aria-current', 'true');
+        if (a.dataset.tocLabel && current) current.textContent = a.dataset.tocLabel;
+      } else {
+        a.removeAttribute('aria-current');
+      }
+    }
+  };
+
   const observer = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        links.forEach((a) => a.removeAttribute('aria-current'));
-        links.get(entry.target.id)?.setAttribute('aria-current', 'true');
+        if (entry.isIntersecting) setCurrent(entry.target.id);
       }
     },
     // A chapter counts as "current" once it crosses the upper third of the screen.
     { rootMargin: '-30% 0px -60% 0px' }
   );
   document.querySelectorAll('[data-chapter]').forEach((el) => observer.observe(el));
+
+  // Picking a chapter from the phone dropdown should close it.
+  mobile?.addEventListener('click', (e) => {
+    if ((e.target as Element).closest('a[data-toc]')) mobile.open = false;
+  });
 </script>
 
 <style>
@@ -1086,30 +1123,98 @@ const grid = [
 
   /* ── Narrow screens ─────────────────────────────────────────────────────── */
 
+  /* Phone table of contents — hidden until the side list no longer fits. */
+  .toc-mobile {
+    display: none;
+  }
+
   @media (max-width: 61.99rem) {
     .guide {
       grid-template-columns: minmax(0, 1fr);
       padding-top: 0;
     }
 
-    /* The contents become a sticky, horizontally scrolling strip. */
     .toc {
+      display: none;
+    }
+
+    /* A sticky bar naming the current chapter; tapping it opens the full list. */
+    .toc-mobile {
+      display: block;
+      position: sticky;
       top: 0;
       z-index: 10;
       margin-inline: calc(var(--gutter) * -1);
-      padding: 0.75rem var(--gutter);
       background: var(--bg-canvas);
       border-bottom: 1px solid var(--border-default);
-      overflow-x: auto;
     }
 
-    .toc ol {
+    .toc-mobile summary {
       display: flex;
-      gap: 0.25rem;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem var(--gutter);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      list-style: none;
+      cursor: pointer;
     }
 
-    .toc a {
-      white-space: nowrap;
+    .toc-mobile summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .toc-mobile__label {
+      font-weight: 500;
+      color: var(--text-tertiary);
+    }
+
+    .toc-mobile__current {
+      color: var(--text-accent);
+    }
+
+    .toc-mobile__chevron {
+      width: 0.5rem;
+      height: 0.5rem;
+      margin-left: auto;
+      border-right: 2px solid var(--text-secondary);
+      border-bottom: 2px solid var(--text-secondary);
+      transform: translateY(-2px) rotate(45deg);
+      transition: transform 0.2s ease;
+    }
+
+    .toc-mobile[open] .toc-mobile__chevron {
+      transform: translateY(2px) rotate(-135deg);
+    }
+
+    .toc-mobile ol {
+      display: grid;
+      gap: 0.125rem;
+      max-height: 60vh;
+      margin: 0;
+      padding: 0 var(--gutter) 0.75rem;
+      overflow-y: auto;
+      list-style: none;
+    }
+
+    .toc-mobile a {
+      display: flex;
+      gap: 0.75rem;
+      padding: 0.625rem 0.75rem;
+      border-radius: var(--radius-md);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .toc-mobile a[aria-current='true'] {
+      background: var(--accent-subtle);
+      color: var(--text-accent);
+      font-weight: 600;
+    }
+
+    .toc-mobile a[aria-current='true'] .toc__num {
+      color: inherit;
     }
 
     .chapter {
