@@ -1,0 +1,50 @@
+{
+  "$description": "Leafworks color tokens. Mirrors the Figma file 'Leafworks Brand Guidelines' (Primitives + Semantic collections).",
+  "primitives": {
+    "neutral": {
+      "0": "#FFFFFF", "50": "#FAFAF9", "100": "#F4F4F2", "200": "#E7E7E4", "300": "#D1D1CD",
+      "400": "#A3A39E", "500": "#737370", "600": "#52524F", "700": "#3A3A38", "800": "#262625",
+      "900": "#171716", "950": "#0A0A0A", "1000": "#000000"
+    },
+    "leaf": {
+      "50": "#F3F8ED", "100": "#E5F0D6", "200": "#CCE3B0", "300": "#ADCE83", "400": "#8BBA4F",
+      "500": "#6D9F2D", "600": "#507C18", "700": "#3A5F0B", "800": "#2C460C", "900": "#1E3008", "950": "#131F05"
+    },
+    "signal": {
+      "50": "#FFEDEB", "100": "#FFD8D1", "200": "#FFB0A3", "300": "#FF806B", "400": "#FF5033",
+      "500": "#FF2400", "600": "#D0270B", "700": "#AA240E", "800": "#851F0F", "900": "#60170B", "950": "#3C0E07"
+    }
+  },
+  "semantic": {
+    "light": {
+      "bg/canvas": "neutral.0", "bg/subtle": "neutral.50", "bg/surface": "neutral.100", "bg/inverse": "neutral.950",
+      "text/primary": "neutral.950", "text/secondary": "neutral.600", "text/tertiary": "neutral.500", "text/inverse": "neutral.0",
+      "border/default": "neutral.200", "border/strong": "neutral.400",
+      "logo/mark": "neutral.1000",
+      "accent/default": "leaf.700", "accent/hover": "leaf.800", "accent/subtle": "leaf.50",
+      "text/accent": "leaf.700", "text/on-accent": "neutral.0",
+      "signal/default": "signal.500", "signal/text": "signal.600", "signal/subtle": "signal.50"
+    },
+    "dark": {
+      "bg/canvas": "neutral.950", "bg/subtle": "neutral.900", "bg/surface": "neutral.800", "bg/inverse": "neutral.0",
+      "text/primary": "neutral.50", "text/secondary": "neutral.400", "text/tertiary": "neutral.500", "text/inverse": "neutral.950",
+      "border/default": "neutral.700", "border/strong": "neutral.600",
+      "logo/mark": "neutral.0",
+      "accent/default": "leaf.400", "accent/hover": "leaf.300", "accent/subtle": "leaf.900",
+      "text/accent": "leaf.400", "text/on-accent": "neutral.950",
+      "signal/default": "signal.500", "signal/text": "signal.400", "signal/subtle": "signal.950"
+    }
+  },
+  "contrast": {
+    "leaf.700 on neutral.0": 7.44,
+    "leaf.400 on neutral.950": 8.71,
+    "signal.500 on neutral.0": 3.82,
+    "signal.500 on neutral.950": 5.19,
+    "signal.600 on neutral.0": 5.28,
+    "text/tertiary dark (neutral.500 on neutral.950)": 4.16
+  },
+  "usage": {
+    "ratio": "monochrome ~90 : leaf ~8 : signal ~2",
+    "signal": "Large text, dots, icons, live indicators only. Never body text on light backgrounds. Keep off product pages placed next to Leafyrics (#BD5320, 11° hue apart)."
+  }
+}

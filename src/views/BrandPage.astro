@@ -1,0 +1,1130 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import type { Locale } from '../i18n/config';
+import { getContent } from '../i18n/content';
+import { getBrandGuide } from '../i18n/brand-guide';
+import colors from '../../brand/tokens/colors.json';
+import markPositive from '../../brand/logo/leafworks-mark-positive.svg?raw';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getContent(locale);
+const g = getBrandGuide(locale);
+
+const sections = [
+  { id: 'brand', label: g.toc.brand },
+  { id: 'logo', label: g.toc.logo },
+  { id: 'color', label: g.toc.color },
+  { id: 'typography', label: g.toc.typography },
+  { id: 'layout', label: g.toc.layout },
+  { id: 'voice', label: g.toc.voice },
+];
+
+// The mark drawn inline with currentColor, so the "don't recolor" example can
+// recolor it without a second asset.
+const markInline = markPositive
+  .replace(/fill="#000000"/g, 'fill="currentColor"')
+  .replace(/ width="\d+" height="\d+"/, '');
+
+const logoFiles = [
+  { label: 'Mark · Positive', file: 'leafworks-mark-positive.svg' },
+  { label: 'Mark · Reversed', file: 'leafworks-mark-reversed.svg' },
+  { label: 'Wordmark · Black', file: 'leafworks-wordmark-black.svg' },
+  { label: 'Wordmark · White', file: 'leafworks-wordmark-white.svg' },
+  { label: 'Lockup · Positive', file: 'leafworks-lockup-positive.svg' },
+  { label: 'Lockup · Reversed', file: 'leafworks-lockup-reversed.svg' },
+];
+
+const ramps = [
+  { key: 'neutral', group: g.color.groups.neutral, steps: colors.primitives.neutral, base: '' },
+  { key: 'leaf', group: g.color.groups.leaf, steps: colors.primitives.leaf, base: '700' },
+  { key: 'signal', group: g.color.groups.signal, steps: colors.primitives.signal, base: '500' },
+] as const;
+
+// Figma text styles (04 Typography). Sizes in px, line height in %.
+const typeScale = [
+  { name: 'Display XL', size: 72, weight: 700, lh: 110, ls: -0.02 },
+  { name: 'Display L', size: 56, weight: 700, lh: 115, ls: -0.02 },
+  { name: 'Heading 1', size: 40, weight: 700, lh: 125, ls: -0.015 },
+  { name: 'Heading 2', size: 32, weight: 700, lh: 130, ls: -0.01 },
+  { name: 'Heading 3', size: 24, weight: 600, lh: 135, ls: 0 },
+  { name: 'Heading 4', size: 20, weight: 600, lh: 140, ls: 0 },
+  { name: 'Body L', size: 18, weight: 400, lh: 160, ls: 0 },
+  { name: 'Body M', size: 16, weight: 400, lh: 160, ls: 0 },
+  { name: 'Body S', size: 14, weight: 400, lh: 155, ls: 0 },
+  { name: 'Label M', size: 14, weight: 600, lh: 140, ls: 0 },
+  { name: 'Caption', size: 12, weight: 400, lh: 145, ls: 0.01 },
+];
+
+const weights = [
+  { value: 400, name: 'Regular', use: g.typography.weightUse.regular },
+  { value: 600, name: 'SemiBold', use: g.typography.weightUse.semibold },
+  { value: 700, name: 'Bold', use: g.typography.weightUse.bold },
+];
+
+const spacing = [4, 8, 12, 16, 24, 32, 48, 64, 96, 128];
+const radii = [
+  { name: 'none', value: 0 },
+  { name: 'sm', value: 6 },
+  { name: 'md', value: 12 },
+  { name: 'lg', value: 20 },
+  { name: 'xl', value: 28 },
+  { name: 'full', value: 9999 },
+];
+const grid = [
+  { device: g.layout.devices.desktop, columns: 12, gutter: 24, margin: 32, max: '1200px' },
+  { device: g.layout.devices.tablet, columns: 8, gutter: 20, margin: 24, max: '—' },
+  { device: g.layout.devices.mobile, columns: 4, gutter: 16, margin: 16, max: '—' },
+];
+---
+
+<BaseLayout locale={locale} route={{ key: 'brand' }} title={t.brand.title} description={t.brand.lead}>
+  <section class="guide-head theme-light">
+    <div class="container guide-head__inner">
+      <p class="eyebrow eyebrow--accent">{t.brand.eyebrow}</p>
+      <h1 class="heading-1">{t.brand.title}</h1>
+      <p class="lead guide-head__lead">{t.brand.lead}</p>
+      <div>
+        <a class="btn btn--primary btn--lg" href="/brand/leafworks-brand-assets.zip" download>
+          {t.brand.downloadAll}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="container guide">
+    <nav class="toc" aria-label={g.toc.label}>
+      <ol>
+        {
+          sections.map((s, i) => (
+            <li>
+              <a href={`#${s.id}`} data-toc={s.id}>
+                <span class="toc__num">{String(i + 1).padStart(2, '0')}</span>
+                {s.label}
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+
+    <div class="guide__body">
+      <!-- 01 Brand -->
+      <section id="brand" class="chapter" data-chapter>
+        <p class="chapter__num">01</p>
+        <h2 class="heading-1">{g.brand.title}</h2>
+        <p class="lead">{g.brand.intro}</p>
+        <div class="tagline-card theme-dark">
+          <p class="eyebrow"><span class="signal-dot"></span>{g.brand.taglineLabel}</p>
+          <p class="tagline-card__text">Tools we wanted.<br /><span>Made for everyone.</span></p>
+        </div>
+        <h3 class="topic">{g.brand.personalityTitle}</h3>
+        <ul class="cards cards--2">
+          {
+            g.brand.personality.map((p) => (
+              <li class="card">
+                <p class="card__title">
+                  {p.title} <span class="muted">· {p.label}</span>
+                </p>
+                <p class="card__body">{p.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <!-- 02 Logo -->
+      <section id="logo" class="chapter" data-chapter>
+        <p class="chapter__num">02</p>
+        <h2 class="heading-1">{g.logo.title}</h2>
+        <p class="lead">{g.logo.intro}</p>
+
+        <h3 class="topic">{g.logo.mark.title}</h3>
+        <p class="topic__body">{g.logo.mark.body}</p>
+        <div class="tiles tiles--2">
+          <figure class="tile tile--light">
+            <img src="/brand/leafworks-mark-positive.svg" alt="Leafworks mark — Positive" class="tile__mark" />
+            <figcaption>Positive · #000000</figcaption>
+          </figure>
+          <figure class="tile tile--dark">
+            <img src="/brand/leafworks-mark-reversed.svg" alt="Leafworks mark — Reversed" class="tile__mark" />
+            <figcaption>Reversed · #FFFFFF</figcaption>
+          </figure>
+        </div>
+
+        <h3 class="topic">{g.logo.wordmark.title}</h3>
+        <p class="topic__body">{g.logo.wordmark.body}</p>
+        <figure class="tile tile--subtle tile--wide">
+          <img src="/brand/leafworks-wordmark-black.svg" alt="Leafworks wordmark" class="tile__wordmark" />
+        </figure>
+
+        <h3 class="topic">{g.logo.lockup.title}</h3>
+        <p class="topic__body">{g.logo.lockup.body}</p>
+        <div class="tiles tiles--2">
+          <figure class="tile tile--light">
+            <img src="/brand/leafworks-lockup-positive.svg" alt="Leafworks lockup — Positive" class="tile__lockup" />
+          </figure>
+          <figure class="tile tile--dark">
+            <img src="/brand/leafworks-lockup-reversed.svg" alt="Leafworks lockup — Reversed" class="tile__lockup" />
+          </figure>
+        </div>
+
+        <div class="split">
+          <div>
+            <h3 class="topic">{g.logo.clearSpace.title}</h3>
+            <p class="topic__body">{g.logo.clearSpace.body}</p>
+            <figure class="tile tile--subtle">
+              <div class="clear-space">
+                <img src="/brand/leafworks-lockup-positive.svg" alt="" />
+              </div>
+              <figcaption class="accent">x = mark height × 0.25</figcaption>
+            </figure>
+          </div>
+          <div>
+            <h3 class="topic">{g.logo.minSize.title}</h3>
+            <p class="topic__body">{g.logo.minSize.body}</p>
+            <figure class="tile tile--subtle min-size">
+              <img src="/brand/leafworks-mark-positive.svg" alt="" style="height: 16px" />
+              <img src="/brand/leafworks-mark-positive.svg" alt="" style="height: 24px" />
+              <img src="/brand/leafworks-mark-positive.svg" alt="" style="height: 32px" />
+              <img src="/brand/leafworks-lockup-positive.svg" alt="" style="height: 24px" />
+              <figcaption>16 · 24 · 32px / lockup 24px</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <h3 class="topic">{g.logo.donts.title}</h3>
+        <ul class="donts">
+          {
+            g.logo.donts.items.map((label, i) => (
+              <li class="dont">
+                <div class:list={['dont__stage', `dont__stage--${i}`]}>
+                  <span class="dont__mark" set:html={markInline} />
+                </div>
+                <p>
+                  <span class="dont__x" aria-hidden="true">✕</span> {label}
+                </p>
+              </li>
+            ))
+          }
+        </ul>
+
+        <h3 class="topic">{g.logo.files}</h3>
+        <ul class="files">
+          {
+            logoFiles.map((f) => (
+              <li>
+                <a class="file" href={`/brand/${f.file}`} download>
+                  <span>{f.label}</span>
+                  <span class="file__meta">SVG ↓</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <!-- 03 Color -->
+      <section id="color" class="chapter" data-chapter>
+        <p class="chapter__num">03</p>
+        <h2 class="heading-1">{g.color.title}</h2>
+        <p class="lead">{g.color.intro}</p>
+
+        {
+          ramps.map((r) => (
+            <div class="ramp">
+              <div class="ramp__head">
+                <h3 class="topic">{r.group.name}</h3>
+                <p class="muted">{r.group.note}</p>
+              </div>
+              <ul class="ramp__steps">
+                {Object.entries(r.steps).map(([step, hex]) => (
+                  <li class:list={['swatch', { 'swatch--base': step === r.base }]}>
+                    <span class="swatch__chip" style={`background:${hex}`} />
+                    <span class="swatch__step">
+                      {step}
+                      {step === r.base && ' ★'}
+                    </span>
+                    <span class="swatch__hex">{hex}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+
+        <div class="split">
+          <div>
+            <h3 class="topic">{g.color.ratio}</h3>
+            <div class="ratio" aria-label="Mono 90 · Leaf 8 · Signal 2">
+              <span style="flex: 90; background: var(--neutral-950)"></span>
+              <span style="flex: 8; background: var(--leaf-700)"></span>
+              <span style="flex: 2; background: var(--signal-500)"></span>
+            </div>
+            <p class="muted ratio__legend">Mono 90 · Leaf 8 · Signal 2</p>
+          </div>
+          <div>
+            <h3 class="topic">{g.color.rulesTitle}</h3>
+            <ul class="bullets">
+              {g.color.rules.map((rule) => <li>{rule}</li>)}
+            </ul>
+          </div>
+        </div>
+        <a class="btn btn--secondary" href="/brand/colors.json" download>{g.color.download} ↓</a>
+      </section>
+
+      <!-- 04 Typography -->
+      <section id="typography" class="chapter" data-chapter>
+        <p class="chapter__num">04</p>
+        <h2 class="heading-1">{g.typography.title}</h2>
+        <p class="lead">{g.typography.intro}</p>
+        <div class="type-hero theme-dark">
+          <span>Aa 가 あ</span>
+          <p>Pretendard · Pretendard JP</p>
+        </div>
+
+        <h3 class="topic">{g.typography.familiesTitle}</h3>
+        <ul class="weights">
+          {
+            g.typography.families.map((f) => (
+              <li class="weights__row">
+                <span class="weights__meta">{f.use}</span>
+                <span>
+                  <strong>{f.name}</strong>
+                  <span class="muted"> — {f.note}</span>
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+
+        <h3 class="topic">{g.typography.weights}</h3>
+        <ul class="weights">
+          {
+            weights.map((w) => (
+              <li class="weights__row">
+                <span class="weights__meta">
+                  {w.name} {w.value}
+                  <span class="muted"> · {w.use}</span>
+                </span>
+                <span class="weights__sample" style={`font-weight:${w.value}`}>
+                  리프웍스 Leafworks
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+
+        <h3 class="topic">{g.typography.scale}</h3>
+        <ul class="scale">
+          {
+            typeScale.map((s) => (
+              <li class="scale__row">
+                <span class="scale__meta">
+                  {s.name}
+                  <span class="muted">
+                    {s.size}px · {s.weight} · {s.lh}%
+                  </span>
+                </span>
+                <span
+                  class="scale__sample"
+                  style={`font-size:${s.size}px;font-weight:${s.weight};line-height:${s.lh / 100};letter-spacing:${s.ls}em`}
+                >
+                  {g.typography.sample}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+        <a class="btn btn--secondary" href="https://github.com/orioncactus/pretendard" target="_blank" rel="noopener noreferrer">
+          {g.typography.source} ↗
+        </a>
+      </section>
+
+      <!-- 05 Layout -->
+      <section id="layout" class="chapter" data-chapter>
+        <p class="chapter__num">05</p>
+        <h2 class="heading-1">{g.layout.title}</h2>
+        <p class="lead">{g.layout.intro}</p>
+
+        <h3 class="topic">{g.layout.spacing}</h3>
+        <ul class="spacing">
+          {
+            spacing.map((s) => (
+              <li>
+                <span class="spacing__box" style={`width:${s}px;height:${s}px`} />
+                <span class="muted">{s}</span>
+              </li>
+            ))
+          }
+        </ul>
+
+        <h3 class="topic">{g.layout.radius}</h3>
+        <ul class="radii">
+          {
+            radii.map((r) => (
+              <li>
+                <span class="radii__box" style={`border-radius:${Math.min(r.value, 48)}px`} />
+                <span class="muted">
+                  {r.name} · {r.value === 9999 ? 'full' : r.value}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+
+        <h3 class="topic">{g.layout.grid}</h3>
+        <div class="grid-preview" aria-hidden="true">
+          {Array.from({ length: 12 }, () => <span />)}
+        </div>
+        <div class="table-wrap">
+          <table class="grid-table">
+            <thead>
+              <tr>
+                <th>{g.layout.gridHead.device}</th>
+                <th>{g.layout.gridHead.columns}</th>
+                <th>{g.layout.gridHead.gutter}</th>
+                <th>{g.layout.gridHead.margin}</th>
+                <th>{g.layout.gridHead.max}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                grid.map((row) => (
+                  <tr>
+                    <td>{row.device}</td>
+                    <td>{row.columns}</td>
+                    <td>{row.gutter}px</td>
+                    <td>{row.margin}px</td>
+                    <td>{row.max}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 06 Voice & Tone -->
+      <section id="voice" class="chapter" data-chapter>
+        <p class="chapter__num">06</p>
+        <h2 class="heading-1">{g.voice.title}</h2>
+        <p class="lead">{g.voice.summary}</p>
+        <ul class="cards cards--2">
+          {
+            g.voice.principles.map((p) => (
+              <li class="card">
+                <p class="card__tag">{p.tag}</p>
+                <p class="card__title">{p.title}</p>
+                <p class="card__body">{p.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+
+        <h3 class="topic">{g.voice.examplesTitle}</h3>
+        <ul class="examples">
+          {
+            g.voice.examples.map((ex) => (
+              <li class="example">
+                <div class="example__box example__box--bad">
+                  <p class="example__label">
+                    {g.voice.dont} · {ex.context}
+                  </p>
+                  <p>{ex.bad}</p>
+                </div>
+                <div class="example__box example__box--good">
+                  <p class="example__label">
+                    {g.voice.do} · {ex.context}
+                  </p>
+                  <p>{ex.good}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+
+        <h3 class="topic">{g.voice.rulesTitle}</h3>
+        <ul class="bullets">
+          {g.voice.rules.map((rule) => <li>{rule}</li>)}
+        </ul>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // Highlight the table-of-contents entry for the chapter in view.
+  const links = new Map(
+    [...document.querySelectorAll<HTMLAnchorElement>('[data-toc]')].map((a) => [a.dataset.toc!, a])
+  );
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        links.forEach((a) => a.removeAttribute('aria-current'));
+        links.get(entry.target.id)?.setAttribute('aria-current', 'true');
+      }
+    },
+    // A chapter counts as "current" once it crosses the upper third of the screen.
+    { rootMargin: '-30% 0px -60% 0px' }
+  );
+  document.querySelectorAll('[data-chapter]').forEach((el) => observer.observe(el));
+</script>
+
+<style>
+  html {
+    scroll-behavior: smooth;
+  }
+
+  .guide-head {
+    padding-block: clamp(4rem, 8vw, 6rem) 3.5rem;
+    border-bottom: 1px solid var(--border-default);
+  }
+
+  .guide-head__inner {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .guide-head__lead {
+    max-width: 44rem;
+  }
+
+  .guide {
+    display: grid;
+    grid-template-columns: 12rem minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    padding-block: 4rem 8rem;
+  }
+
+  /* ── Table of contents ──────────────────────────────────────────────────── */
+
+  .toc {
+    position: sticky;
+    top: 2rem;
+    align-self: start;
+  }
+
+  .toc ol {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .toc a {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .toc a:hover {
+    color: var(--text-primary);
+  }
+
+  .toc a[aria-current='true'] {
+    background: var(--accent-subtle);
+    color: var(--text-accent);
+    font-weight: 600;
+  }
+
+  .toc__num {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-tertiary);
+  }
+
+  .toc a[aria-current='true'] .toc__num {
+    color: inherit;
+  }
+
+  /* ── Chapters ───────────────────────────────────────────────────────────── */
+
+  .guide__body {
+    display: grid;
+    gap: 7rem;
+  }
+
+  .chapter {
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+    scroll-margin-top: 2rem;
+  }
+
+  .chapter > .btn {
+    justify-self: start;
+  }
+
+  .chapter__num {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-accent);
+  }
+
+  .topic {
+    margin-top: 2rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .topic__body {
+    margin-top: -0.5rem;
+    color: var(--text-secondary);
+  }
+
+  .muted {
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  .accent {
+    color: var(--text-accent);
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: 2rem;
+  }
+
+  .split > div {
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+  }
+
+  .split .topic__body {
+    margin-top: -0.5rem;
+  }
+
+  .cards {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cards--2 {
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  }
+
+  .card {
+    display: grid;
+    gap: 0.5rem;
+    align-content: start;
+    padding: 1.75rem 2rem;
+    border-radius: var(--radius-lg);
+    background: var(--bg-subtle);
+  }
+
+  .card__tag {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-accent);
+  }
+
+  .card__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .card__body {
+    color: var(--text-secondary);
+  }
+
+  .bullets {
+    display: grid;
+    gap: 0.625rem;
+    margin: 0;
+    padding-left: 1.25rem;
+    color: var(--text-secondary);
+  }
+
+  /* ── Brand ──────────────────────────────────────────────────────────────── */
+
+  .tagline-card {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 1rem;
+    padding: clamp(2rem, 5vw, 3.5rem);
+    border-radius: 1.5rem;
+  }
+
+  .tagline-card__text {
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  .tagline-card__text span {
+    color: var(--text-accent);
+  }
+
+  /* ── Logo ───────────────────────────────────────────────────────────────── */
+
+  .tiles {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .tiles--2 {
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  }
+
+  .tile {
+    display: grid;
+    place-items: center;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 3rem 2rem 1.5rem;
+    border-radius: 1.5rem;
+    font-size: 0.8125rem;
+  }
+
+  .tile figcaption {
+    color: var(--text-tertiary);
+  }
+
+  .tile--light {
+    background: var(--neutral-50);
+    box-shadow: inset 0 0 0 1px var(--border-default);
+  }
+
+  .tile--dark {
+    background: var(--neutral-950);
+  }
+
+  .tile--dark figcaption {
+    color: var(--neutral-400);
+  }
+
+  .tile--subtle {
+    background: var(--bg-subtle);
+  }
+
+  .tile--wide {
+    padding-block: 3.5rem;
+  }
+
+  .tile__mark {
+    height: 9rem;
+    width: auto;
+  }
+
+  .tile__wordmark {
+    height: 4rem;
+    width: auto;
+  }
+
+  .tile__lockup {
+    height: 4.5rem;
+    width: auto;
+    margin-bottom: 1.5rem;
+  }
+
+  .clear-space {
+    padding: 0.75rem;
+    border: 1px dashed var(--accent-default);
+    background: var(--accent-subtle);
+  }
+
+  .clear-space img {
+    height: 3rem;
+    width: auto;
+    background: var(--neutral-0);
+  }
+
+  .min-size {
+    grid-auto-flow: column;
+    align-items: center;
+    gap: 1.5rem;
+    min-height: 10rem;
+  }
+
+  .min-size img {
+    width: auto;
+  }
+
+  .min-size figcaption {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .donts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .dont {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--bg-subtle);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .dont__stage {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    color: var(--neutral-1000);
+  }
+
+  .dont__mark {
+    display: block;
+    width: 62%;
+  }
+
+  .dont__mark :global(svg) {
+    width: 100%;
+    height: auto;
+  }
+
+  .dont__stage--0 {
+    color: var(--signal-500);
+  }
+
+  .dont__stage--1 .dont__mark {
+    transform: scale(1.35, 0.8);
+  }
+
+  .dont__stage--2 .dont__mark {
+    transform: rotate(-24deg);
+  }
+
+  .dont__stage--3 .dont__mark {
+    filter: drop-shadow(8px 10px 6px rgba(58, 95, 11, 0.55));
+  }
+
+  .dont__stage--4 {
+    background: linear-gradient(135deg, #ff2400, #6fb283 55%, #7fa8d9);
+  }
+
+  .dont__x {
+    color: var(--signal-text);
+  }
+
+  .files {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .file {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.875rem 1rem;
+    border-radius: var(--radius-md);
+    background: var(--bg-subtle);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .file:hover {
+    box-shadow: inset 0 0 0 1px var(--border-strong);
+  }
+
+  .file__meta {
+    font-weight: 700;
+    color: var(--text-accent);
+  }
+
+  /* ── Color ──────────────────────────────────────────────────────────────── */
+
+  .ramp {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .ramp__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 1rem;
+  }
+
+  .ramp__steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .swatch {
+    display: grid;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .swatch__chip {
+    aspect-ratio: 1;
+    margin-bottom: 0.25rem;
+    border-radius: var(--radius-md);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+  }
+
+  .swatch__step {
+    font-weight: 600;
+  }
+
+  .swatch__hex {
+    color: var(--text-tertiary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ratio {
+    display: flex;
+    height: 4.5rem;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+  }
+
+  .ratio__legend {
+    margin-top: -0.5rem;
+    font-size: 0.875rem;
+  }
+
+  /* ── Typography ─────────────────────────────────────────────────────────── */
+
+  .type-hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: clamp(2rem, 5vw, 3.5rem);
+    border-radius: 1.5rem;
+  }
+
+  .type-hero span {
+    font-size: clamp(4rem, 12vw, 9rem);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .type-hero p {
+    color: var(--text-secondary);
+  }
+
+  .weights,
+  .scale {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .weights__row,
+  .scale__row {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: 1.5rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--border-default);
+  }
+
+  .weights__meta,
+  .scale__meta {
+    display: grid;
+    gap: 0.125rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  .weights__sample {
+    font-size: 1.75rem;
+  }
+
+  .scale__sample {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* ── Layout ─────────────────────────────────────────────────────────────── */
+
+  .spacing,
+  .radii {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .spacing li,
+  .radii li {
+    display: grid;
+    justify-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .spacing__box {
+    background: var(--accent-default);
+    border-radius: 2px;
+  }
+
+  .radii__box {
+    width: 6rem;
+    height: 6rem;
+    background: var(--bg-surface);
+    border: 1.5px solid var(--border-strong);
+  }
+
+  .grid-preview {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 0.75rem;
+    height: 8rem;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--bg-subtle);
+  }
+
+  .grid-preview span {
+    border-radius: var(--radius-sm);
+    background: var(--accent-subtle);
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  .grid-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .grid-table th,
+  .grid-table td {
+    padding: 0.875rem 0.75rem;
+    border-bottom: 1px solid var(--border-default);
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .grid-table th {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  /* ── Voice ──────────────────────────────────────────────────────────────── */
+
+  .examples {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .example {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1rem;
+  }
+
+  .example__box {
+    display: grid;
+    gap: 0.5rem;
+    padding: 1.25rem 1.5rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .example__box--bad {
+    background: var(--signal-subtle);
+  }
+
+  .example__box--good {
+    background: var(--accent-subtle);
+  }
+
+  .example__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .example__box--bad .example__label {
+    color: var(--signal-text);
+  }
+
+  .example__box--good .example__label {
+    color: var(--text-accent);
+  }
+
+  /* ── Narrow screens ─────────────────────────────────────────────────────── */
+
+  @media (max-width: 61.99rem) {
+    .guide {
+      grid-template-columns: minmax(0, 1fr);
+      padding-top: 0;
+    }
+
+    /* The contents become a sticky, horizontally scrolling strip. */
+    .toc {
+      top: 0;
+      z-index: 10;
+      margin-inline: calc(var(--gutter) * -1);
+      padding: 0.75rem var(--gutter);
+      background: var(--bg-canvas);
+      border-bottom: 1px solid var(--border-default);
+      overflow-x: auto;
+    }
+
+    .toc ol {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .toc a {
+      white-space: nowrap;
+    }
+
+    .chapter {
+      scroll-margin-top: 4.5rem;
+    }
+
+    .guide__body {
+      padding-top: 3rem;
+      gap: 5rem;
+    }
+
+    .weights__row,
+    .scale__row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.5rem;
+    }
+  }
+</style>

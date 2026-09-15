@@ -1,0 +1,75 @@
+name: Deploy
+
+# Build on every push and pull request; deploy only from main.
+# Cloudflare's Git integration is deliberately not connected — it reports nothing
+# back to GitHub, so a failed build would only be visible in the dashboard.
+
+on:
+  push:
+    branches: [main]
+    # '*.md', not '**.md': one star does not cross a slash, so only root documents
+    # (README, CLAUDE) are skipped. Content under src/ still deploys when edited.
+    paths-ignore: ['*.md']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          # Node 22 pairs with npm 10, which the lockfile is written with.
+          # Bumping this without regenerating the lockfile breaks `npm ci`.
+          node-version: '22'
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Type-check and build
+        # `astro check` runs first, so a missing translation fails here.
+        run: npm run build
+
+      - name: Upload build
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist
+          retention-days: 7
+
+  deploy:
+    name: Deploy to Cloudflare
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.deployment-url }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist
+
+      - name: Deploy
+        id: deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # dist/ comes from the build job, so this must not rebuild it.
+          command: deploy

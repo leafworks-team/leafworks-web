@@ -1,0 +1,87 @@
+---
+import AppFolder from './AppFolder';
+import { APPS } from '../data/apps';
+import { localizedPath, type Locale } from '../i18n/config';
+import { getContent } from '../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getContent(locale);
+
+const apps = APPS.map((a) => ({
+  slug: a.slug,
+  name: a.name,
+  icon: a.icon,
+  summary: a.summary[locale],
+  href: localizedPath({ key: 'app', slug: a.slug }, locale),
+}));
+---
+
+<section id="apps" class="apps theme-light">
+  <div class="container apps__inner">
+    <div class="apps__heading">
+      <p class="eyebrow eyebrow--accent">{t.apps.eyebrow}</p>
+      <h2 class="heading-1">{t.apps.title}</h2>
+      <p class="lead">{t.apps.lead}</p>
+    </div>
+    <AppFolder
+      client:visible
+      apps={apps}
+      labels={{
+        folder: t.apps.folder,
+        open: t.apps.open,
+        close: t.apps.close,
+        comingSoon: t.apps.comingSoon,
+        next: t.apps.next,
+      }}
+    />
+    <noscript>
+      <ul class="apps__fallback">
+        {
+          apps.map((a) => (
+            <li>
+              <a href={a.href}>
+                {a.name} — {a.summary}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </noscript>
+  </div>
+</section>
+
+<style>
+  .apps {
+    background: var(--bg-subtle);
+    padding-block: clamp(6rem, 12vw, 9rem) clamp(7rem, 14vw, 10rem);
+  }
+
+  .apps__inner {
+    display: grid;
+    justify-items: center;
+    gap: 3.5rem;
+  }
+
+  .apps__heading {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .apps__fallback {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+  }
+
+  .apps__fallback a {
+    color: var(--text-accent);
+  }
+</style>

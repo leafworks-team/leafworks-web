@@ -1,0 +1,116 @@
+/* Leafworks design tokens — mirrors brand/tokens/colors.json and the Figma
+   variables (Primitives / Semantic / Dimension). Change all three together.
+
+   The site does not follow the OS colour scheme. Like the Figma frames, each
+   section picks its own mode: .theme-dark for the branding sections, .theme-light
+   for content. The semantic names are identical in both, so components only ever
+   read --bg-*, --text-*, --border-*, --accent-*. */
+
+:root {
+  /* Primitives */
+  --neutral-0: #ffffff;
+  --neutral-50: #fafaf9;
+  --neutral-100: #f4f4f2;
+  --neutral-200: #e7e7e4;
+  --neutral-300: #d1d1cd;
+  --neutral-400: #a3a39e;
+  --neutral-500: #737370;
+  --neutral-600: #52524f;
+  --neutral-700: #3a3a38;
+  --neutral-800: #262625;
+  --neutral-900: #171716;
+  --neutral-950: #0a0a0a;
+  --neutral-1000: #000000;
+
+  --leaf-50: #f3f8ed;
+  --leaf-100: #e5f0d6;
+  --leaf-200: #cce3b0;
+  --leaf-300: #adce83;
+  --leaf-400: #8bba4f;
+  --leaf-500: #6d9f2d;
+  --leaf-600: #507c18;
+  --leaf-700: #3a5f0b;
+  --leaf-800: #2c460c;
+  --leaf-900: #1e3008;
+  --leaf-950: #131f05;
+
+  --signal-50: #ffedeb;
+  --signal-400: #ff5033;
+  --signal-500: #ff2400;
+  --signal-600: #d0270b;
+  --signal-950: #3c0e07;
+
+  /* Dimension */
+  --space-4: 0.25rem;
+  --space-8: 0.5rem;
+  --space-12: 0.75rem;
+  --space-16: 1rem;
+  --space-24: 1.5rem;
+  --space-32: 2rem;
+  --space-48: 3rem;
+  --space-64: 4rem;
+  --space-96: 6rem;
+  --space-128: 8rem;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  /* Layout — Web Grid on the 05 Layout page */
+  --container: 75rem;
+  --gutter: clamp(1rem, 3.4vw, 3rem);
+
+  --font: 'Pretendard JP Variable', 'Pretendard JP', -apple-system, BlinkMacSystemFont,
+    system-ui, 'Apple SD Gothic Neo', 'Hiragino Sans', 'Noto Sans KR', 'Noto Sans JP',
+    'Segoe UI', sans-serif;
+}
+
+/* Semantic — Light (also the page default) */
+:root,
+.theme-light {
+  --bg-canvas: var(--neutral-0);
+  --bg-subtle: var(--neutral-50);
+  --bg-surface: var(--neutral-100);
+  --bg-inverse: var(--neutral-950);
+  --text-primary: var(--neutral-950);
+  --text-secondary: var(--neutral-600);
+  --text-tertiary: var(--neutral-500);
+  --text-inverse: var(--neutral-0);
+  --border-default: var(--neutral-200);
+  --border-strong: var(--neutral-400);
+  --accent-default: var(--leaf-700);
+  --accent-hover: var(--leaf-800);
+  --accent-subtle: var(--leaf-50);
+  --text-accent: var(--leaf-700);
+  --text-on-accent: var(--neutral-0);
+  --signal-default: var(--signal-500);
+  --signal-text: var(--signal-600);
+  --signal-subtle: var(--signal-50);
+  color-scheme: light;
+}
+
+/* Semantic — Dark */
+.theme-dark {
+  --bg-canvas: var(--neutral-950);
+  --bg-subtle: var(--neutral-900);
+  --bg-surface: var(--neutral-800);
+  --bg-inverse: var(--neutral-0);
+  --text-primary: var(--neutral-50);
+  --text-secondary: var(--neutral-400);
+  /* 4.16:1 on --bg-canvas — below 4.5 for body text. Use for captions only. */
+  --text-tertiary: var(--neutral-500);
+  --text-inverse: var(--neutral-950);
+  --border-default: var(--neutral-700);
+  --border-strong: var(--neutral-600);
+  --accent-default: var(--leaf-400);
+  --accent-hover: var(--leaf-300);
+  --accent-subtle: var(--leaf-900);
+  --text-accent: var(--leaf-400);
+  --text-on-accent: var(--neutral-950);
+  --signal-default: var(--signal-500);
+  --signal-text: var(--signal-400);
+  --signal-subtle: var(--signal-950);
+  color-scheme: dark;
+}

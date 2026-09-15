@@ -1,0 +1,85 @@
+---
+import type { Locale } from '../i18n/config';
+import { getContent } from '../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+
+const t = getContent(Astro.props.locale);
+---
+
+<section id="about" class="about theme-light">
+  <div class="container about__inner">
+    <p class="eyebrow eyebrow--accent">{t.about.eyebrow}</p>
+    <h2 class="heading-1">
+      {t.about.title.map((line) => <span class="about__line">{line}</span>)}
+    </h2>
+    <p class="lead about__body">{t.about.body}</p>
+    <ul class="about__pillars">
+      {
+        t.about.pillars.map((p, i) => (
+          <li class="pillar">
+            <span class="pillar__index">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="heading-2">
+              {p.title} <span class="pillar__label">· {p.label}</span>
+            </h3>
+            <p>{p.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .about {
+    padding-block: clamp(3rem, 6vw, 5rem) clamp(6rem, 12vw, 9rem);
+  }
+
+  .about__inner {
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  .about__line {
+    display: block;
+  }
+
+  .about__body {
+    max-width: 54rem;
+  }
+
+  .about__pillars {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: 1.5rem;
+    margin: 1.75rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pillar {
+    display: grid;
+    gap: 0.75rem;
+    padding: 2.25rem 2.5rem;
+    border-radius: var(--radius-lg);
+    background: var(--bg-subtle);
+  }
+
+  .pillar__index {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-accent);
+  }
+
+  .pillar__label {
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .pillar p {
+    color: var(--text-secondary);
+    font-size: 1.0625rem;
+  }
+</style>

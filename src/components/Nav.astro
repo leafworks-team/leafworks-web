@@ -1,0 +1,124 @@
+---
+import { LOCALES, LOCALE_NAMES, LOCALE_SHORT, localizedPath, type Locale, type Route } from '../i18n/config';
+import { getContent, SUPPORT_EMAIL } from '../i18n/content';
+
+interface Props {
+  locale: Locale;
+  route: Route;
+  theme: 'dark' | 'light';
+}
+
+const { locale, route, theme } = Astro.props;
+const t = getContent(locale);
+const home = localizedPath({ key: 'home' }, locale);
+const lockup = theme === 'dark' ? '/brand/leafworks-lockup-reversed.svg' : '/brand/leafworks-lockup-positive.svg';
+---
+
+<header class:list={['nav', `theme-${theme}`]}>
+  <div class="nav__inner">
+    <a href={home} class="nav__brand" aria-label={t.nav.home}>
+      <img src={lockup} alt="Leafworks" height="36" draggable="false" />
+    </a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href={`${home}#apps`}>{t.nav.apps}</a>
+      <a href={`${home}#about`}>{t.nav.about}</a>
+      <a href={localizedPath({ key: 'brand' }, locale)}>{t.nav.brand}</a>
+      <a href={`mailto:${SUPPORT_EMAIL}`}>{t.nav.contact}</a>
+    </nav>
+    <div class="nav__lang" role="group" aria-label={t.nav.language}>
+      {
+        LOCALES.map((l, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">/</span>}
+            <a
+              href={localizedPath(route, l)}
+              hreflang={l}
+              lang={l}
+              title={LOCALE_NAMES[l]}
+              aria-current={l === locale ? 'true' : undefined}
+            >
+              {LOCALE_SHORT[l]}
+            </a>
+          </>
+        ))
+      }
+    </div>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: relative;
+    z-index: 30;
+  }
+
+  .nav__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-32);
+    padding: 1.25rem var(--gutter);
+  }
+
+  .nav__brand img {
+    height: 2.25rem;
+    width: auto;
+  }
+
+  .nav__links {
+    display: flex;
+    gap: 2.25rem;
+    margin-left: auto;
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  .nav__links a {
+    color: var(--text-secondary);
+    transition: color 0.15s ease;
+  }
+
+  .nav__links a:hover {
+    color: var(--text-primary);
+  }
+
+  .nav__lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-full);
+    font-size: 0.8125rem;
+    color: var(--text-tertiary);
+  }
+
+  .nav__lang a {
+    font-weight: 500;
+    color: var(--text-tertiary);
+  }
+
+  .nav__lang a[aria-current='true'] {
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 47.99rem) {
+    .nav__inner {
+      padding-block: 1rem;
+    }
+
+    .nav__brand img {
+      height: 1.875rem;
+    }
+
+    /* Four links do not fit beside the lockup on a phone; the page itself is
+       short enough that the language toggle is the only control that must stay. */
+    .nav__links {
+      display: none;
+    }
+
+    .nav__lang {
+      margin-left: auto;
+    }
+  }
+</style>

@@ -1,0 +1,115 @@
+---
+/**
+ * Page transition: a link marked `data-curtain` (or window.leafworksCurtain.go)
+ * raises the wave curtain, navigates, and the next page opens by retracting it.
+ * The flag crosses the navigation in sessionStorage.
+ */
+---
+
+<svg class="page-curtain" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="page-curtain-leaf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8bba4f"></stop>
+      <stop offset="100%" stop-color="#3a5f0b"></stop>
+    </linearGradient>
+  </defs>
+  <path class="page-curtain__path" fill="url(#page-curtain-leaf)"></path>
+  <path class="page-curtain__path" fill="#ffffff"></path>
+</svg>
+
+<script is:inline>
+  // Runs during parsing, before first paint: if we arrived through the curtain,
+  // cover the page now so it never flashes in before the retract animation.
+  try {
+    if (sessionStorage.getItem('lw-curtain') === '1') {
+      var svg = document.currentScript.previousElementSibling;
+      svg.classList.add('is-active');
+      svg.querySelectorAll('path').forEach(function (p) {
+        p.setAttribute('d', 'M 0 0 H 100 V 100 H 0 Z');
+      });
+    }
+  } catch (e) {}
+</script>
+
+<script>
+  import { buildCurtain, prefersReducedMotion } from '../scripts/curtain';
+
+  const KEY = 'lw-curtain';
+  const svg = document.querySelector<SVGSVGElement>('.page-curtain')!;
+  const paths = [...svg.querySelectorAll<SVGPathElement>('.page-curtain__path')];
+  let busy = false;
+
+  function hide() {
+    svg.classList.remove('is-active');
+    paths.forEach((p) => p.removeAttribute('d'));
+  }
+
+  function go(href: string) {
+    if (busy) return;
+    if (prefersReducedMotion()) {
+      window.location.href = href;
+      return;
+    }
+    busy = true;
+    svg.classList.add('is-active');
+    const tl = buildCurtain(paths, 'rise');
+    tl.eventCallback('onComplete', () => {
+      try {
+        sessionStorage.setItem(KEY, '1');
+      } catch {}
+      window.location.href = href;
+    });
+    tl.play();
+  }
+
+  window.leafworksCurtain = { go };
+
+  // Arrived through the curtain: withdraw it.
+  let arrived = false;
+  try {
+    arrived = sessionStorage.getItem(KEY) === '1';
+    sessionStorage.removeItem(KEY);
+  } catch {}
+  if (arrived) {
+    if (prefersReducedMotion()) {
+      hide();
+    } else {
+      const tl = buildCurtain(paths, 'retract');
+      tl.eventCallback('onComplete', hide);
+      tl.play();
+    }
+  }
+
+  // Back/forward cache restores the page exactly as it was left — fully covered.
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) {
+      busy = false;
+      hide();
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const link = (e.target as Element).closest<HTMLAnchorElement>('a[data-curtain]');
+    if (!link) return;
+    e.preventDefault();
+    go(link.href);
+  });
+</script>
+
+<style>
+  .page-curtain {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: none;
+  }
+
+  .page-curtain:global(.is-active) {
+    display: block;
+    pointer-events: auto;
+  }
+</style>

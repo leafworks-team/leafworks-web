@@ -1,0 +1,260 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import type { App } from '../data/apps';
+import { localizedPath, type Locale } from '../i18n/config';
+import { getContent } from '../i18n/content';
+
+interface Props {
+  locale: Locale;
+  app: App;
+}
+
+const { locale, app } = Astro.props;
+const t = getContent(locale);
+const home = localizedPath({ key: 'home' }, locale);
+const hasLinks = Boolean(app.homepage || app.github);
+
+const displayUrl = (url: string) => url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+
+const info = [
+  { label: t.appDetail.info.platform, value: app.platforms.join(' · ') },
+  { label: t.appDetail.info.status, value: t.appDetail.status[app.status] },
+  app.license && { label: t.appDetail.info.license, value: app.license },
+  app.homepage && { label: t.appDetail.info.website, value: displayUrl(app.homepage), href: app.homepage },
+  app.github && { label: t.appDetail.info.source, value: displayUrl(app.github), href: app.github },
+].filter((row): row is { label: string; value: string; href?: string } => Boolean(row));
+---
+
+<BaseLayout
+  locale={locale}
+  route={{ key: 'app', slug: app.slug }}
+  title={app.name}
+  description={app.tagline[locale]}
+>
+  <section class="app-hero theme-light">
+    <div class="container app-hero__inner">
+      <a class="app-hero__back" href={`${home}#apps`}>{t.appDetail.back}</a>
+      <div class="app-hero__title">
+        <img class="app-hero__icon" src={app.icon} alt="" width="160" height="160" />
+        <div class="app-hero__copy">
+          <h1 class="display">{app.name}</h1>
+          <p class="app-hero__tagline">{app.tagline[locale]}</p>
+        </div>
+      </div>
+      <ul class="chips">
+        {app.platforms.map((p) => <li class="chip">{p}</li>)}
+        <li class="chip chip--status">{t.appDetail.status[app.status]}</li>
+      </ul>
+      {
+        hasLinks ? (
+          <div class="app-hero__links">
+            {app.homepage && (
+              <a class="btn btn--inverse btn--lg" href={app.homepage} target="_blank" rel="noopener noreferrer">
+                {t.appDetail.homepage} ↗
+              </a>
+            )}
+            {app.github && (
+              <a class="btn btn--secondary btn--lg" href={app.github} target="_blank" rel="noopener noreferrer">
+                {t.appDetail.github} ↗
+              </a>
+            )}
+          </div>
+        ) : (
+          <p class="app-hero__unavailable">{t.appDetail.unavailable}</p>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="app-about theme-light">
+    <div class="container app-about__inner">
+      <p class="app-about__description">{app.description[locale]}</p>
+      <h2 class="visually-hidden">{t.appDetail.features}</h2>
+      <ul class="features">
+        {
+          app.features.map((f) => (
+            <li class="feature">
+              <h3>{f.title[locale]}</h3>
+              <p>{f.body[locale]}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="app-info theme-light">
+    <dl class="container app-info__list">
+      {
+        info.map((row) => (
+          <div class="app-info__row">
+            <dt>{row.label}</dt>
+            <dd>
+              {row.href ? (
+                <a href={row.href} target="_blank" rel="noopener noreferrer">
+                  {row.value}
+                </a>
+              ) : (
+                row.value
+              )}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+</BaseLayout>
+
+<style>
+  .app-hero {
+    padding-block: 3rem 5rem;
+  }
+
+  .app-hero__inner {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .app-hero__back {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .app-hero__back:hover {
+    color: var(--text-primary);
+  }
+
+  .app-hero__title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2.5rem;
+  }
+
+  .app-hero__icon {
+    width: 10rem;
+    height: 10rem;
+    border-radius: 22.5%;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08), 0 16px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  .app-hero__copy {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .app-hero__tagline {
+    font-size: clamp(1.25rem, 1vw + 1rem, 1.625rem);
+    font-weight: 500;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .chip {
+    padding: 0.375rem 0.875rem;
+    border-radius: var(--radius-full);
+    background: var(--bg-surface);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .chip--status {
+    background: var(--accent-subtle);
+    color: var(--text-accent);
+  }
+
+  .app-hero__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .app-hero__unavailable {
+    font-size: 0.9375rem;
+    color: var(--text-tertiary);
+  }
+
+  .app-about {
+    background: var(--bg-subtle);
+    padding-block: 4.5rem;
+  }
+
+  .app-about__inner {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .app-about__description {
+    max-width: 48rem;
+    font-size: clamp(1.0625rem, 0.3vw + 1rem, 1.25rem);
+    line-height: 1.75;
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .feature {
+    display: grid;
+    gap: 0.625rem;
+    padding: 1.75rem 2rem;
+    border-radius: var(--radius-lg);
+    background: var(--bg-canvas);
+  }
+
+  .feature h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .feature p {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+  }
+
+  .app-info {
+    padding-block: 4rem 6rem;
+  }
+
+  .app-info__list {
+    margin-block: 0;
+  }
+
+  .app-info__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 1.125rem;
+    border-bottom: 1px solid var(--border-default);
+    font-size: 0.9375rem;
+  }
+
+  .app-info__row dt {
+    color: var(--text-secondary);
+  }
+
+  .app-info__row dd {
+    margin: 0;
+    font-weight: 500;
+    text-align: right;
+  }
+
+  .app-info__row a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

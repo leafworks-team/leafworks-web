@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import HorizontalTagline from '../components/HorizontalTagline.astro';
+import WaveSection from '../components/WaveSection.astro';
+import About from '../components/About.astro';
+import AppsSection from '../components/AppsSection.astro';
+import type { Locale } from '../i18n/config';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<BaseLayout locale={locale} route={{ key: 'home' }} navTheme="dark">
+  <Hero locale={locale} />
+  <HorizontalTagline locale={locale} />
+  <WaveSection />
+  <About locale={locale} />
+  <AppsSection locale={locale} />
+</BaseLayout>

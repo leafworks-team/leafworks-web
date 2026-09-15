@@ -1,0 +1,25 @@
+{
+  // Static-assets-only Worker: there is no server code, so no `main` entry.
+  // Cloudflare serves ./dist directly from its edge.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "leafworks-web",
+  "compatibility_date": "2026-09-15",
+  "assets": {
+    "directory": "./dist",
+    // Serve dist/404.html for paths that match no file, instead of a bare 404.
+    "not_found_handling": "404-page"
+  },
+
+  // The domain lives here rather than in the dashboard so it is reproducible:
+  // `wrangler deploy` creates the custom domain and its DNS record.
+  //
+  // leafworks.dev is already a zone in this account (Cloudflare nameservers),
+  // and the deploy token is scoped to it. Cloudflare refuses to create a custom
+  // domain over an existing record on the same hostname — remove any hand-made
+  // A/CNAME for these names first. The MX/TXT records for Email Routing are
+  // unaffected.
+  "routes": [
+    { "pattern": "leafworks.dev", "custom_domain": true },
+    { "pattern": "www.leafworks.dev", "custom_domain": true }
+  ]
+}

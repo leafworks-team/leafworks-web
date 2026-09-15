@@ -1,0 +1,62 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import PageCurtain from '../components/PageCurtain.astro';
+import { DEFAULT_LOCALE, HTML_LANG, LOCALES, localizedPath, type Locale, type Route } from '../i18n/config';
+import { getContent } from '../i18n/content';
+
+interface Props {
+  locale: Locale;
+  route: Route;
+  title?: string;
+  description?: string;
+  /** Home opens on dark branding sections; content pages start light. */
+  navTheme?: 'dark' | 'light';
+}
+
+const { locale, route, navTheme = 'light' } = Astro.props;
+const t = getContent(locale);
+const title = Astro.props.title ? `${Astro.props.title} — Leafworks` : t.meta.title;
+const description = Astro.props.description ?? t.meta.description;
+
+const canonical = new URL(localizedPath(route, locale), Astro.site);
+
+// Every translation of this page is declared on every translation, plus
+// x-default for visitors whose language matches neither.
+const alternates = LOCALES.map((l) => ({
+  hreflang: HTML_LANG[l],
+  href: new URL(localizedPath(route, l), Astro.site).toString(),
+}));
+const xDefault = new URL(localizedPath(route, DEFAULT_LOCALE), Astro.site).toString();
+---
+
+<!doctype html>
+<html lang={HTML_LANG[locale]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
+    <link rel="alternate" hreflang="x-default" href={xDefault} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Leafworks" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={HTML_LANG[locale]} />
+    <meta name="twitter:card" content="summary" />
+  </head>
+  <body>
+    <Nav locale={locale} route={route} theme={navTheme} />
+    <main>
+      <slot />
+    </main>
+    <Footer locale={locale} />
+    <PageCurtain />
+  </body>
+</html>

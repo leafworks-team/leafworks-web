@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-label="Leafyrics">
+  <!-- Full-bleed tile: the site clips it to a rounded square. Artwork from
+       leafyrics-hub assets/logo/app-icon.svg with the macOS inset plate removed. -->
+  <rect width="1024" height="1024" fill="#BD5320"/>
+  <svg x="287" y="287" width="450" height="450" viewBox="0 0 64 64" fill="none">
+    <path fill="#FFFFFF" fill-rule="evenodd" d="M32 3 C22 14 3 30 32 56 C61 30 42 14 32 3 Z M21 32 A2 2 0 0 1 25 32 L25 38 A2 2 0 0 1 21 38 Z M27 21 A2 2 0 0 1 31 21 L31 38 A2 2 0 0 1 27 38 Z M33 27 A2 2 0 0 1 37 27 L37 38 A2 2 0 0 1 33 38 Z M39 34 A2 2 0 0 1 43 34 L43 38 A2 2 0 0 1 39 38 Z"/>
+    <path stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" d="M32 54 C32 58 30.5 60 28 61"/>
+  </svg>
+</svg>

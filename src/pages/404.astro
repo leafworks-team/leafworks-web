@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getContent } from '../i18n/content';
+
+// One 404 serves every path, so it cannot know the visitor's language from the
+// URL. Korean leads (the default locale); English and Japanese follow.
+const ko = getContent('ko');
+const en = getContent('en');
+const ja = getContent('ja');
+---
+
+<BaseLayout locale="ko" route={{ key: 'home' }} title={ko.notFound.title}>
+  <section class="not-found theme-light">
+    <div class="container not-found__inner">
+      <p class="not-found__code">404</p>
+      <h1 class="heading-2">{ko.notFound.title}</h1>
+      <p>{ko.notFound.body}</p>
+      <p lang="en" class="not-found__en">{en.notFound.title} — {en.notFound.body}</p>
+      <p lang="ja" class="not-found__en">{ja.notFound.title} — {ja.notFound.body}</p>
+      <div class="not-found__actions">
+        <a class="btn btn--inverse btn--lg" href="/">{ko.notFound.home}</a>
+        <a class="btn btn--secondary btn--lg" href="/en/" lang="en">{en.notFound.home}</a>
+        <a class="btn btn--secondary btn--lg" href="/ja/" lang="ja">{ja.notFound.home}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    padding-block: 8rem 10rem;
+  }
+
+  .not-found__inner {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+
+  .not-found__code {
+    font-size: clamp(4rem, 10vw, 8rem);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text-accent);
+  }
+
+  .not-found__en {
+    color: var(--text-secondary);
+  }
+
+  .not-found__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+</style>
