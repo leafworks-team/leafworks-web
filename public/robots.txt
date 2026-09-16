@@ -1,0 +1,35 @@
+# The brand guide and the app detail pages are kept out of search results.
+# The home page stays open.
+#
+# Link-preview crawlers are listed separately below: they obey robots.txt too,
+# and blocking them would break the share cards for exactly these pages.
+
+User-agent: *
+Disallow: /brand/
+Disallow: /en/brand/
+Disallow: /ja/brand/
+Disallow: /apps/
+Disallow: /en/apps/
+Disallow: /ja/apps/
+
+# Link previews (KakaoTalk, Facebook/Threads, X, Slack, Discord, LINE).
+User-agent: kakaotalk-scrap
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: Slackbot-LinkExpanding
+Allow: /
+
+User-agent: Slackbot
+Allow: /
+
+User-agent: Discordbot
+Allow: /
+
+User-agent: LINE
+Allow: /

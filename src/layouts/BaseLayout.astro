@@ -16,6 +16,13 @@ interface Props {
   /** Link-preview image in public/, 1200×630. App pages pass their own. */
   ogImage?: string;
   ogImageAlt?: string;
+  /**
+   * Keep the page out of search results. public/robots.txt also disallows these
+   * paths — a crawler that obeys it never reads this tag, so the two are belt
+   * and braces. To have an already-indexed page dropped, remove the robots.txt
+   * rule so the crawler can come back and see this.
+   */
+  noindex?: boolean;
 }
 
 const {
@@ -24,6 +31,7 @@ const {
   navTheme = 'light',
   ogImage = '/og/leafworks.png',
   ogImageAlt = 'Leafworks — Tools we wanted. Made for everyone.',
+  noindex = false,
 } = Astro.props;
 const ogImageUrl = new URL(ogImage, Astro.site).toString();
 const t = getContent(locale);
@@ -48,6 +56,7 @@ const xDefault = new URL(localizedPath(route, DEFAULT_LOCALE), Astro.site).toStr
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     {alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
