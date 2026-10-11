@@ -74,7 +74,7 @@ const ko = {
     contact: 'Contact',
     brand: 'Brand',
     brandLink: '브랜드 가이드 →',
-    business: '리프웍스(Leafworks) · 대표 임태건 · 사업자등록번호 320-64-00793',
+    business: '리프웍스(Leafworks)',
     rights: '© 2026 Leafworks. All rights reserved.',
   },
   notFound: {
@@ -154,7 +154,7 @@ const en: Content = {
     contact: 'Contact',
     brand: 'Brand',
     brandLink: 'Brand guidelines →',
-    business: 'Leafworks · CEO TAEGEON LIM · Business Registration No. 320-64-00793',
+    business: 'Leafworks',
     rights: '© 2026 Leafworks. All rights reserved.',
   },
   notFound: {
@@ -232,7 +232,7 @@ const ja: Content = {
     contact: 'Contact',
     brand: 'Brand',
     brandLink: 'ブランドガイドライン →',
-    business: 'Leafworks · 代表 TAEGEON LIM · 事業者登録番号 320-64-00793',
+    business: 'Leafworks',
     rights: '© 2026 Leafworks. All rights reserved.',
   },
   notFound: {
