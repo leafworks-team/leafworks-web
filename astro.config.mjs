@@ -41,5 +41,13 @@ export default defineConfig({
     // Bind the configured port or fail — landing silently on 7789 means
     // checking the wrong address.
     server: { strictPort: true },
+    // Pre-bundle the packages browser code imports. Otherwise Vite finds
+    // motion/react only when the apps folder first loads, re-bundles mid
+    // session, and the open page keeps asking for the old bundle (504
+    // "Outdated Optimize Dep"), so the folder never hydrates and clicks do
+    // nothing in dev.
+    optimizeDeps: {
+      include: ['react', 'react-dom/client', 'motion/react', 'gsap', 'gsap/ScrollTrigger', 'gsap/SplitText'],
+    },
   },
 });
