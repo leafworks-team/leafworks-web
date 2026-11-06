@@ -1,0 +1,54 @@
+---
+import { localizedPath, type Locale } from '../i18n/config';
+import { getContent } from '../i18n/content';
+import { documentKinds, versionDates } from '../data/legal/documents';
+
+interface Props {
+  locale: Locale;
+  app: string;
+}
+
+const { locale, app } = Astro.props;
+const t = getContent(locale);
+---
+
+<ul class="documents">
+  {
+    documentKinds(app).map((kind) => (
+      <li>
+        <a href={localizedPath({ key: 'legalDocument', app, doc: kind }, locale)}>
+          <span class="documents__name">{t.legal.documents[kind]}</span>
+          <span class="documents__date">{`${t.legal.effective} ${versionDates(app, kind)[0]}`}</span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .documents {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--border-default);
+  }
+
+  .documents a {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--border-default);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .documents__name {
+    font-weight: 600;
+  }
+
+  .documents__date {
+    color: var(--text-secondary);
+  }
+</style>

@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LegalDocumentList from '../components/LegalDocumentList.astro';
+import { localizedPath, type Locale } from '../i18n/config';
+import { getContent } from '../i18n/content';
+import { LEGAL_APPS } from '../data/legal/documents';
+import { APPS } from '../data/apps';
+
+interface Props {
+  locale: Locale;
+  app: string;
+}
+
+const { locale, app } = Astro.props;
+const t = getContent(locale);
+const entry = LEGAL_APPS.find((candidate) => candidate.slug === app);
+if (!entry) throw new Error(`Unknown legal app: ${app}`);
+const name = entry.name[locale];
+// Apps with a page under /apps/ get a link back to it. Not every app has one.
+const hasAppPage = APPS.some((candidate) => candidate.slug === app);
+---
+
+<BaseLayout locale={locale} route={{ key: 'legalApp', app }} title={`${name} ${t.legal.title}`} noindex>
+  <section class="legal theme-light">
+    <div class="container legal__inner">
+      <a class="legal__back" href={localizedPath({ key: 'legal' }, locale)}>← {t.legal.title}</a>
+      <h1 class="heading-2">{name}</h1>
+      {hasAppPage && <a class="legal__about" href={localizedPath({ key: 'app', slug: app }, locale)}>{t.legal.aboutApp}</a>}
+      <LegalDocumentList locale={locale} app={app} />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal {
+    padding-block: clamp(3rem, 6vw, 5rem) 6rem;
+  }
+
+  .legal__inner {
+    max-width: calc(48rem + var(--gutter) * 2);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .legal__back {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9375rem;
+  }
+
+  .legal__about {
+    color: var(--text-accent);
+    font-size: 0.9375rem;
+  }
+</style>

@@ -1,0 +1,16 @@
+---
+import LegalAppPage from '../../../../views/LegalAppPage.astro';
+import { LEGAL_APPS } from '../../../../data/legal/documents';
+
+export function getStaticPaths() {
+  return LEGAL_APPS.map((app) => ({ params: { app: app.slug }, props: { app: app.slug } }));
+}
+
+interface Props {
+  app: string;
+}
+
+const { app } = Astro.props;
+---
+
+<LegalAppPage locale="ja" app={app} />

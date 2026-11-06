@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import type { App } from '../data/apps';
 import { localizedPath, type Locale } from '../i18n/config';
 import { getContent } from '../i18n/content';
+import { documentKinds } from '../data/legal/documents';
 
 interface Props {
   locale: Locale;
@@ -13,6 +14,8 @@ const { locale, app } = Astro.props;
 const t = getContent(locale);
 const home = localizedPath({ key: 'home' }, locale);
 const hasLinks = Boolean(app.homepage || app.github);
+// The documents themselves live under /legal/ so their URLs survive changes to these marketing pages
+const legalKinds = documentKinds(app.slug);
 
 const displayUrl = (url: string) => url.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
@@ -103,6 +106,23 @@ const info = [
             </dd>
           </div>
         ))
+      }
+      {
+        legalKinds.length > 0 && (
+          <div class="app-info__row">
+            <dt>{t.legal.title}</dt>
+            <dd>
+              {legalKinds.map((kind, index) => (
+                <>
+                  {index > 0 && ' · '}
+                  <a href={localizedPath({ key: 'legalDocument', app: app.slug, doc: kind }, locale)}>
+                    {t.legal.documents[kind]}
+                  </a>
+                </>
+              ))}
+            </dd>
+          </div>
+        )
       }
     </dl>
   </section>

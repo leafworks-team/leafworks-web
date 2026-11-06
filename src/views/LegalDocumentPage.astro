@@ -1,0 +1,388 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { localizedPath, type Locale } from '../i18n/config';
+import { getContent } from '../i18n/content';
+import { LEGAL_APPS, documentVersion, versionDates, type DocumentKind } from '../data/legal/documents';
+
+interface Props {
+  locale: Locale;
+  app: string;
+  kind: DocumentKind;
+}
+
+const { locale, app, kind } = Astro.props;
+const t = getContent(locale);
+const entry = LEGAL_APPS.find((candidate) => candidate.slug === app);
+if (!entry) throw new Error(`Unknown legal app: ${app}`);
+const name = entry.name[locale];
+const title = t.legal.documents[kind];
+const dates = versionDates(app, kind);
+const latest = dates[0];
+const versions = dates.map((date) => ({ date, ...documentVersion(app, kind, date, locale) }));
+const stablePath = localizedPath({ key: 'legalDocument', app, doc: kind }, locale);
+---
+
+<BaseLayout locale={locale} route={{ key: 'legalDocument', app, doc: kind }} title={`${name} ${title}`} noindex>
+  <article class="document theme-light">
+    <div class="container document__inner">
+      <a class="document__back" href={localizedPath({ key: 'legalApp', app }, locale)}>← {name}</a>
+      <header class="document__head">
+        <h1 class="heading-2">{name} {title}</h1>
+        {/* Version menu. Its links also work without the script: they reload with ?date= and the script reads it */}
+        <details class="versions" data-versions>
+          <summary class="versions__trigger" aria-label={t.legal.versions}>
+            <span class="versions__label">{t.legal.effective}</span>
+            <span class="versions__date" data-current-date>{latest}</span>
+            <span class="versions__badge" data-current-latest>{t.legal.latest}</span>
+            <svg class="versions__chevron" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+              <path
+                d="M4 6l4 4 4-4"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </summary>
+          <ul class="versions__menu">
+            {
+              dates.map((date) => (
+                <li>
+                  <a
+                    class="versions__item"
+                    href={date === latest ? stablePath : `${stablePath}?date=${date}`}
+                    data-date={date}
+                    aria-current={date === latest ? 'true' : undefined}
+                  >
+                    <span>{date}</span>
+                    {date === latest && <span class="versions__badge">{t.legal.latest}</span>}
+                    <svg class="versions__check" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+                      <path
+                        d="M3.5 8.5l3 3 6-7"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.75"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </details>
+      </header>
+      {
+        versions.map(({ date, version, fallback }) => (
+          // Every version is in the page. The newest shows by default and the script below swaps in the one
+          // named by ?date=, because a static site serves the same file whatever the query says.
+          <div class="document__version" data-version={date} hidden={date !== latest}>
+            {version.draft && <p class="document__notice document__notice--draft">{t.legal.draft}</p>}
+            {date !== latest && (
+              <p class="document__notice">
+                {t.legal.olderNotice} <a href={stablePath}>{t.legal.seeLatest}</a>
+              </p>
+            )}
+            {fallback && (
+              <p class="document__notice">{t.legal.fallback[version.locale === 'en' ? 'en' : 'ko']}</p>
+            )}
+            {version.changes && (
+              <section class="document__changes">
+                <h2>{t.legal.changes}</h2>
+                <p>{version.changes}</p>
+              </section>
+            )}
+            <div class="document__body" lang={fallback ? version.locale : undefined}>
+              <version.Content />
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </article>
+</BaseLayout>
+
+<script>
+  const menu = document.querySelector<HTMLDetailsElement>('[data-versions]');
+  const items = [...document.querySelectorAll<HTMLAnchorElement>('.versions__item')];
+  const versions = [...document.querySelectorAll<HTMLElement>('[data-version]')];
+  const latest = versions[0]?.dataset.version;
+  const currentDate = document.querySelector<HTMLElement>('[data-current-date]');
+  const currentLatest = document.querySelector<HTMLElement>('[data-current-latest]');
+
+  /** Shows the version for `date`, or the newest when the date is missing or unknown, and updates the menu. */
+  function show(date: string | null) {
+    const target = versions.some((version) => version.dataset.version === date) ? date : latest;
+    for (const version of versions) version.hidden = version.dataset.version !== target;
+    for (const item of items) {
+      if (item.dataset.date === target) item.setAttribute('aria-current', 'true');
+      else item.removeAttribute('aria-current');
+    }
+    if (currentDate && target) currentDate.textContent = target;
+    if (currentLatest) currentLatest.hidden = target !== latest;
+  }
+
+  show(new URLSearchParams(location.search).get('date'));
+
+  // Swap versions in place instead of reloading, and keep the address shareable
+  for (const item of items) {
+    item.addEventListener('click', (click) => {
+      click.preventDefault();
+      history.pushState(null, '', item.href);
+      show(item.dataset.date ?? null);
+      if (menu) menu.open = false;
+    });
+  }
+
+  window.addEventListener('popstate', () => show(new URLSearchParams(location.search).get('date')));
+
+  // A details menu stays open until its summary is clicked again, so close it from outside and with Escape
+  document.addEventListener('click', (click) => {
+    if (menu?.open && !menu.contains(click.target as Node)) menu.open = false;
+  });
+  document.addEventListener('keydown', (press) => {
+    if (press.key === 'Escape' && menu?.open) {
+      menu.open = false;
+      menu.querySelector('summary')?.focus();
+    }
+  });
+</script>
+
+<style>
+  .document {
+    padding-block: clamp(3rem, 6vw, 5rem) 6rem;
+  }
+
+  .document__inner {
+    max-width: calc(48rem + var(--gutter) * 2);
+    display: grid;
+    /* A grid column grows to its widest child by default, and a wide table would push the page sideways */
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  .document__back {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9375rem;
+  }
+
+  /* Title on the left, version menu on the right. On a phone the menu drops under the title */
+  .document__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+  }
+
+  .versions {
+    position: relative;
+  }
+
+  /* Same pill as the language switch in the top bar */
+  .versions__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem 0.5rem 1rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-full);
+    background: var(--bg-canvas);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+    transition: border-color 0.15s ease;
+  }
+
+  .versions__trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .versions__trigger:hover,
+  .versions[open] .versions__trigger {
+    border-color: var(--text-primary);
+  }
+
+  .versions__label {
+    color: var(--text-secondary);
+  }
+
+  .versions__chevron {
+    color: var(--text-secondary);
+    transition: transform 0.15s ease;
+  }
+
+  .versions[open] .versions__chevron {
+    transform: rotate(180deg);
+  }
+
+  .versions__badge {
+    padding: 0.0625rem 0.5rem;
+    border-radius: var(--radius-full);
+    background: var(--bg-inverse);
+    color: var(--text-inverse);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  .versions__badge[hidden] {
+    display: none;
+  }
+
+  .versions__menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    z-index: 20;
+    min-width: 14rem;
+    margin: 0;
+    padding: 0.375rem;
+    list-style: none;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    background: var(--bg-canvas);
+    box-shadow:
+      0 12px 32px rgb(0 0 0 / 0.08),
+      0 2px 6px rgb(0 0 0 / 0.04);
+  }
+
+  .document .versions__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+  }
+
+  .document .versions__item:hover {
+    background: var(--bg-subtle);
+  }
+
+  .versions__check {
+    margin-left: auto;
+    color: var(--text-primary);
+    visibility: hidden;
+  }
+
+  .document .versions__item[aria-current='true'] {
+    font-weight: 600;
+  }
+
+  .versions__item[aria-current='true'] .versions__check {
+    visibility: visible;
+  }
+
+  /* On a phone the pill sits at the left under the title, so the menu opens from its left edge */
+  @media (max-width: 47.99rem) {
+    .versions__menu {
+      right: auto;
+      left: 0;
+    }
+  }
+
+  .document__version {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  .document__version[hidden] {
+    display: none;
+  }
+
+  .document__notice {
+    padding: 0.875rem 1rem;
+    border-radius: 12px;
+    background: var(--bg-subtle);
+    color: var(--text-secondary);
+  }
+
+  /* A draft must never pass for the version in force, so it gets the loudest notice on the page. */
+  .document__notice--draft {
+    background: var(--signal-50);
+    color: var(--signal-600);
+    font-weight: 600;
+  }
+
+  .document__changes h2 {
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .document a {
+    color: var(--text-accent);
+  }
+
+  .document__body {
+    line-height: 1.75;
+  }
+
+  .document__body :global(h2) {
+    margin: 2.5rem 0 1rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .document__body :global(h3) {
+    margin: 1.75rem 0 0.75rem;
+    font-size: 1.0625rem;
+    font-weight: 700;
+  }
+
+  .document__body :global(p),
+  .document__body :global(ul),
+  .document__body :global(ol) {
+    margin: 0 0 1rem;
+  }
+
+  .document__body :global(ul),
+  .document__body :global(ol) {
+    padding-left: 1.25rem;
+  }
+
+  /* Wide tables scroll inside themselves so the page never scrolls sideways on a phone. */
+  .document__body :global(table) {
+    display: block;
+    overflow-x: auto;
+    width: 100%;
+    margin: 0 0 1rem;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .document__body :global(th),
+  .document__body :global(td) {
+    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--border-default);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .document__body :global(th) {
+    background: var(--bg-subtle);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* Values still to be decided in a draft */
+  .document__body :global(mark) {
+    padding: 0 0.2em;
+    background: var(--signal-50);
+    color: var(--signal-600);
+  }
+</style>

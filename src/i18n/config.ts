@@ -34,7 +34,14 @@ export const HTML_LANG: Record<Locale, string> = {
  * and getting that wrong silently sends the language toggle to a 404 — so each
  * page states its own key instead.
  */
-export type Route = { key: 'home' } | { key: 'brand' } | { key: 'app'; slug: string };
+export type Route =
+  | { key: 'home' }
+  | { key: 'brand' }
+  | { key: 'app'; slug: string }
+  | { key: 'legal' }
+  | { key: 'legalApp'; app: string }
+  // One document of one app. The page holds every version and shows the newest unless the URL has `?date=`.
+  | { key: 'legalDocument'; app: string; doc: string };
 
 /** Absolute path for a route in a locale, with the trailing slash Astro emits. */
 export function localizedPath(route: Route, locale: Locale): string {
@@ -46,6 +53,12 @@ export function localizedPath(route: Route, locale: Locale): string {
       return `${prefix}/brand/`;
     case 'app':
       return `${prefix}/apps/${route.slug}/`;
+    case 'legal':
+      return `${prefix}/legal/`;
+    case 'legalApp':
+      return `${prefix}/legal/${route.app}/`;
+    case 'legalDocument':
+      return `${prefix}/legal/${route.app}/${route.doc}/`;
   }
 }
 

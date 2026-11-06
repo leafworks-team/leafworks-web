@@ -1,4 +1,4 @@
-# The brand guide and the app detail pages are kept out of search results.
+# The brand guide, the app detail pages and the legal documents are kept out of search results.
 # The home page stays open.
 #
 # Link-preview crawlers are listed separately below: they obey robots.txt too,
@@ -11,6 +11,9 @@ Disallow: /ja/brand/
 Disallow: /apps/
 Disallow: /en/apps/
 Disallow: /ja/apps/
+Disallow: /legal/
+Disallow: /en/legal/
+Disallow: /ja/legal/
 
 # Link previews (KakaoTalk, Facebook/Threads, X, Slack, Discord, LINE).
 User-agent: kakaotalk-scrap

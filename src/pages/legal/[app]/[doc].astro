@@ -1,0 +1,20 @@
+---
+import LegalDocumentPage from '../../../views/LegalDocumentPage.astro';
+import { LEGAL_APPS, documentKinds, type DocumentKind } from '../../../data/legal/documents';
+
+// The stable URL of each document. It holds every version, so this is the one the app and store listings link to.
+export function getStaticPaths() {
+  return LEGAL_APPS.flatMap((app) =>
+    documentKinds(app.slug).map((kind) => ({ params: { app: app.slug, doc: kind }, props: { app: app.slug, kind } })),
+  );
+}
+
+interface Props {
+  app: string;
+  kind: DocumentKind;
+}
+
+const { app, kind } = Astro.props;
+---
+
+<LegalDocumentPage locale="ko" app={app} kind={kind} />
