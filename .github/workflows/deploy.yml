@@ -59,13 +59,6 @@ jobs:
       # wrangler-action reports a custom domain as "leafworks.dev (custom domain)",
       # which GitHub rejects as a URL — state the real address instead.
       url: https://leafworks.dev
-    env:
-      # The zone caches pages at the edge, so a deploy alone kept serving the old pages
-      # (2026-11-10: a new legal page stayed 404 for over ten minutes). The purge step
-      # below needs a token with Zone > Cache Purge on leafworks.dev; without these
-      # secrets it is skipped and the deploy still succeeds.
-      CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-      CLOUDFLARE_CACHE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_CACHE_PURGE_TOKEN }}
     steps:
       - uses: actions/checkout@v7
 
@@ -84,18 +77,22 @@ jobs:
           command: deploy
 
       - name: Purge edge cache
-        if: env.CLOUDFLARE_ZONE_ID != '' && env.CLOUDFLARE_CACHE_PURGE_TOKEN != ''
+        # A deploy alone kept serving old pages for more than ten minutes (2026-11-10: a new legal
+        # page stayed 404). Needs a token with Zone > Cache Purge on leafworks.dev. Without the
+        # secrets it only warns, and a failed purge does not fail the deploy, which is already live.
+        continue-on-error: true
+        env:
+          ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          PURGE_TOKEN: ${{ secrets.CLOUDFLARE_CACHE_PURGE_TOKEN }}
         run: |
+          if [ -z "$ZONE_ID" ] || [ -z "$PURGE_TOKEN" ]; then
+            echo "::warning::Cache purge skipped: add CLOUDFLARE_ZONE_ID and CLOUDFLARE_CACHE_PURGE_TOKEN secrets."
+            exit 0
+          fi
           response=$(curl --silent --show-error --fail-with-body \
-            --request POST "https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/purge_cache" \
-            --header "Authorization: Bearer ${CLOUDFLARE_CACHE_PURGE_TOKEN}" \
+            --request POST "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/purge_cache" \
+            --header "Authorization: Bearer ${PURGE_TOKEN}" \
             --header "Content-Type: application/json" \
-            --data '{"purge_everything":true}')
-          echo "$response" | grep -q '"success":true' || { echo "$response"; exit 1; }
+            --data '{"purge_everything":true}') || { echo "$response"; exit 1; }
+          echo "$response" | jq -e '.success == true' > /dev/null || { echo "$response"; exit 1; }
           echo "Purged the leafworks.dev edge cache"
-
-      - name: Note a skipped purge
-        if: env.CLOUDFLARE_ZONE_ID == '' || env.CLOUDFLARE_CACHE_PURGE_TOKEN == ''
-        run: >-
-          echo "::warning::Cache purge skipped: add CLOUDFLARE_ZONE_ID and CLOUDFLARE_CACHE_PURGE_TOKEN
-          secrets, or old pages may stay cached at the edge."
