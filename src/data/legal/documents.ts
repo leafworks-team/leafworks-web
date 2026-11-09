@@ -8,7 +8,7 @@ import { DEFAULT_LOCALE, type Locale } from '../../i18n/config';
  * together with the engine's notices, which would run to megabytes on a web page.
  *
  * Each version is a self-contained Markdown file named `<app>/<document>/<effective date>.<locale>.md`
- * (for example `geonneolkka/privacy-policy/2026-12-01.ko.md`). A published version is never edited:
+ * (for example `geonneolkka/privacy-policy/2026-11-16.ko.md`). A published version is never edited:
  * a change becomes a new file with a new date, so every older version keeps reading exactly as it
  * did when it was in force. That is also why the parts every document repeats (contact, rights) are
  * not a live component: changing one would silently rewrite every old version. Copy them from the
@@ -25,7 +25,7 @@ export const LEGAL_APPS = [{ slug: 'geonneolkka', name: { ko: '건널까', en: '
 export type LegalApp = (typeof LEGAL_APPS)[number];
 
 /** Document kinds in the order an app's list shows them. An app only lists the ones it has. */
-export const DOCUMENT_KINDS = ['terms-of-service', 'privacy-policy', 'security'] as const;
+export const DOCUMENT_KINDS = ['terms-of-service', 'privacy-policy', 'refund-policy', 'security'] as const;
 
 export type DocumentKind = (typeof DOCUMENT_KINDS)[number];
 

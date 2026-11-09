@@ -84,6 +84,7 @@ const ko = {
     documents: {
       'terms-of-service': '이용약관',
       'privacy-policy': '개인정보처리방침',
+      'refund-policy': '환불정책',
       security: '보안 취약점 신고',
     },
     effective: '시행일',
@@ -184,6 +185,7 @@ const en: Content = {
     documents: {
       'terms-of-service': 'Terms of Service',
       'privacy-policy': 'Privacy Policy',
+      'refund-policy': 'Refund Policy',
       security: 'Security Vulnerability Reporting',
     },
     effective: 'Effective',
@@ -281,6 +283,7 @@ const ja: Content = {
     documents: {
       'terms-of-service': '利用規約',
       'privacy-policy': 'プライバシーポリシー',
+      'refund-policy': '返金ポリシー',
       security: '脆弱性の報告',
     },
     effective: '施行日',
