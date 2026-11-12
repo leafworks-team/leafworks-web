@@ -108,7 +108,7 @@ export const layerdeckDetail = {
     ja: 'Windowsでは、インストーラーの実行時に保護に関する警告が表示される場合があります。',
   },
   imageNote: {
-    ko: '이미지 크게 보기', en: 'Open full-size image (Korean)', ja: '画像を拡大して表示（韓国語）',
+    ko: '화면 크게 보기', en: 'Open full-size image (Korean UI)', ja: '画像を拡大して表示（韓国語のUI）',
   },
 } satisfies Record<string, Localized>;
 
@@ -144,5 +144,56 @@ export const layerdeckRequirements: { label: Localized; value: Localized }[] = [
 ];
 
 export const layerdeckImages = [
-  '01-overview.png', '02-keymap.png', '03-slots.png', '04-keytest.png',
-];
+  {
+    file: 'overview-screen.png',
+    alt: {
+      ko: '슬롯 목록과 Base·Mac·Fn 레이어가 표시된 키보드 편집 화면',
+      en: 'Keyboard editor with saved slots and Base, Mac, and Fn layers',
+      ja: 'スロット一覧とBase・Mac・Fnレイヤーが表示されたキーボード編集画面',
+    },
+    note: {
+      ko: 'ZMK Studio USB 연결을 지원하는 키보드에서 사용할 수 있습니다.',
+      en: 'Works with keyboards that support ZMK Studio over USB.',
+      ja: 'ZMK StudioのUSB接続に対応したキーボードで使用できます。',
+    },
+  },
+  {
+    file: 'keymap-screen.png',
+    alt: {
+      ko: '키보드 배열에서 F 키를 선택하고 동작을 지정하는 화면',
+      en: 'The F key selected in the keyboard layout with its assigned function shown alongside',
+      ja: 'キー配列でFキーを選択し、機能を割り当てる画面',
+    },
+    note: {
+      ko: '사용할 수 있는 동작과 레이어 수는 키보드 펌웨어에 따라 달라집니다.',
+      en: 'Available functions and the number of layers depend on your keyboard firmware.',
+      ja: '利用できる機能とレイヤー数は、キーボードのファームウェアによって異なります。',
+    },
+  },
+  {
+    file: 'slots-screen.png',
+    alt: {
+      ko: '저장된 슬롯 목록과 슬롯 파일 내보내기·가져오기 화면',
+      en: 'Saved slots with options to export and import slot files',
+      ja: '保存したスロットの一覧と、スロットファイルの書き出し・読み込み画面',
+    },
+    note: {
+      ko: '슬롯에는 키맵을 보관합니다. 펌웨어와 블루투스 연결 정보는 포함하지 않습니다.',
+      en: 'Slots store keymaps. They do not include firmware or Bluetooth pairing information.',
+      ja: 'スロットに保存されるのはキーマップです。ファームウェアやBluetoothのペアリング情報は含まれません。',
+    },
+  },
+  {
+    file: 'keytest-screen.png',
+    alt: {
+      ko: '입력이 확인된 키가 초록색으로 표시된 키보드 배열',
+      en: 'Keyboard layout with detected key inputs highlighted in green',
+      ja: '入力が確認されたキーを緑色で表示したキー配列',
+    },
+    note: {
+      ko: '같은 입력을 보내는 키나 레이어 전환 키는 각각 구분하기 어려울 수 있습니다.',
+      en: 'Keys that send the same input, or keys that switch layers, may not be individually distinguishable.',
+      ja: '同じ入力を送るキーやレイヤー切り替えキーは、個別に区別できない場合があります。',
+    },
+  },
+] satisfies { file: string; alt: Localized; note: Localized }[];
