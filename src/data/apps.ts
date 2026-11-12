@@ -1,6 +1,7 @@
 import type { Locale } from '../i18n/config';
+import { layerdeck } from './apps/layerdeck';
 
-type Localized = Record<Locale, string>;
+export type Localized = Record<Locale, string>;
 
 export type AppStatus = 'in-development' | 'released';
 
@@ -17,6 +18,9 @@ export interface App {
   platforms: string[];
   status: AppStatus;
   license?: string;
+  category?: Localized;
+  downloadNote?: Localized;
+  downloads?: { label: Localized; url: string }[];
   /**
    * Only public URLs. A link to a private repository 404s for every visitor, so
    * leave these out until the destination is public — the page hides the button.
@@ -78,55 +82,7 @@ export const APPS: App[] = [
     // The organisation page: every app repository under it is still private.
     github: 'https://github.com/leafyrics',
   },
-  {
-    slug: 'layerdeck',
-    name: 'LayerDeck',
-    icon: '/apps/layerdeck.svg',
-    tagline: {
-      ko: 'ZMK 키보드를 위한 키맵 편집·키 테스트·백업 도구.',
-      en: 'Keymap editor, key tester and backup tool for ZMK keyboards.',
-      ja: 'ZMKキーボードのためのキーマップ編集・キーテスト・バックアップツール。',
-    },
-    summary: {
-      ko: 'ZMK 키보드 도구',
-      en: 'ZMK keyboard tool',
-      ja: 'ZMKキーボードツール',
-    },
-    description: {
-      ko: 'ZMK Studio를 지원하는 키보드라면 어떤 키보드든 연결해 키맵을 편집하고, 모든 스위치가 실제로 눌리는지 확인하고, 설정을 파일로 백업하거나 여러 벌을 바꿔 가며 쓸 수 있습니다.',
-      en: 'Connect any keyboard that supports ZMK Studio to edit its keymap, check that every switch really registers, and back up or swap between multiple layouts.',
-      ja: 'ZMK Studioに対応したキーボードなら、どれでも接続してキーマップを編集し、すべてのスイッチが実際に反応するかを確かめ、設定をファイルにバックアップしたり複数を切り替えたりできます。',
-    },
-    features: [
-      {
-        title: { ko: '키 테스트', en: 'Key test', ja: 'キーテスト' },
-        body: {
-          ko: '중복 키코드와 레이어 키까지 모든 스위치를 확인합니다.',
-          en: 'Checks every switch, including duplicate keycodes and layer keys.',
-          ja: '重複したキーコードやレイヤーキーまで、すべてのスイッチを確認します。',
-        },
-      },
-      {
-        title: { ko: '내보내기 · 가져오기', en: 'Export · Import', ja: 'エクスポート · インポート' },
-        body: {
-          ko: '키맵을 파일로 백업하고 그대로 되돌립니다.',
-          en: 'Back up a keymap to a file and restore it exactly.',
-          ja: 'キーマップをファイルにバックアップし、そのまま元に戻せます。',
-        },
-      },
-      {
-        title: { ko: '슬롯', en: 'Slots', ja: 'スロット' },
-        body: {
-          ko: '설정을 여러 벌 두고 원하는 것을 바로 적용합니다.',
-          en: 'Keep several layouts and apply any of them at once.',
-          ja: '複数の設定を保存し、使いたいものをすぐに適用できます。',
-        },
-      },
-    ],
-    platforms: ['macOS', 'Windows'],
-    status: 'in-development',
-    // No public repository or homepage yet — the page shows "not public yet".
-  },
+  layerdeck,
 ];
 
 export function getApp(slug: string): App | undefined {

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import LayerDeckContent from './apps/LayerDeckContent.astro';
 import type { App } from '../data/apps';
 import { localizedPath, type Locale } from '../i18n/config';
 import { getContent } from '../i18n/content';
@@ -13,8 +14,10 @@ interface Props {
 const { locale, app } = Astro.props;
 const t = getContent(locale);
 const home = localizedPath({ key: 'home' }, locale);
+const isLayerDeck = app.slug === 'layerdeck';
+const hasDownloads = Boolean(app.downloads?.length);
 const hasLinks = Boolean(app.homepage || app.github);
-// The documents themselves live under /legal/ so their URLs survive changes to these marketing pages
+// 소개 페이지가 바뀌어도 문서 주소를 유지하도록 /legal/ 경로를 사용함
 const legalKinds = documentKinds(app.slug);
 
 const displayUrl = (url: string) => url.replace(/^https?:\/\//, '').replace(/\/$/, '');
@@ -37,7 +40,7 @@ const info = [
   ogImageAlt={`${app.name} — ${app.tagline.en}`}
   noindex
 >
-  <section class="app-hero theme-light">
+  <section class:list={['app-hero theme-light', { 'app-hero--downloads': hasDownloads }]}>
     <div class="container app-hero__inner">
       <a class="app-hero__back" href={`${home}#apps`}>{t.appDetail.back}</a>
       <div class="app-hero__title">
@@ -47,12 +50,26 @@ const info = [
           <p class="app-hero__tagline">{app.tagline[locale]}</p>
         </div>
       </div>
-      <ul class="chips">
-        {app.platforms.map((p) => <li class="chip">{p}</li>)}
-        <li class="chip chip--status">{t.appDetail.status[app.status]}</li>
-      </ul>
+      {hasDownloads ? (
+        <p class="app-hero__platforms">
+          {app.platforms.join(' · ')}{app.category && ` / ${app.category[locale]}`}
+        </p>
+      ) : (
+        <ul class="chips">
+          {app.platforms.map((platform) => <li class="chip">{platform}</li>)}
+          <li class="chip chip--status">{t.appDetail.status[app.status]}</li>
+        </ul>
+      )}
       {
-        hasLinks ? (
+        hasDownloads ? (
+          <div class="app-hero__links">
+            {app.downloads?.map((download, index) => (
+              <a class:list={['btn btn--lg', index === 0 ? 'btn--inverse' : 'btn--secondary']} href={download.url}>
+                {download.label[locale]}
+              </a>
+            ))}
+          </div>
+        ) : hasLinks ? (
           <div class="app-hero__links">
             {app.homepage && (
               <a class="btn btn--inverse btn--lg" href={app.homepage} target="_blank" rel="noopener noreferrer">
@@ -69,63 +86,70 @@ const info = [
           <p class="app-hero__unavailable">{t.appDetail.unavailable}</p>
         )
       }
+      {app.downloadNote && <p class="app-hero__note">{app.downloadNote[locale]}</p>}
     </div>
   </section>
 
-  <section class="app-about theme-light">
-    <div class="container app-about__inner">
-      <p class="app-about__description">{app.description[locale]}</p>
-      <h2 class="visually-hidden">{t.appDetail.features}</h2>
-      <ul class="features">
+  {isLayerDeck ? <LayerDeckContent locale={locale} /> : (
+    <section class="app-about theme-light">
+      <div class="container app-about__inner">
+        <p class="app-about__description">{app.description[locale]}</p>
+        <h2 class="visually-hidden">{t.appDetail.features}</h2>
+        <ul class="features">
+          {
+            app.features.map((f) => (
+              <li class="feature">
+                <h3>{f.title[locale]}</h3>
+                <p>{f.body[locale]}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+  )}
+
+  {(!isLayerDeck || legalKinds.length > 0) && (
+    <section class="app-info theme-light">
+      <dl class="container app-info__list">
         {
-          app.features.map((f) => (
-            <li class="feature">
-              <h3>{f.title[locale]}</h3>
-              <p>{f.body[locale]}</p>
-            </li>
+          !isLayerDeck && info.map((row) => (
+            <div class="app-info__row">
+              <dt>{row.label}</dt>
+              <dd>
+                {row.href ? (
+                  <a href={row.href} target="_blank" rel="noopener noreferrer">
+                    {row.value}
+                  </a>
+                ) : (
+                  row.value
+                )}
+              </dd>
+            </div>
           ))
         }
-      </ul>
-    </div>
-  </section>
+        {
+          legalKinds.length > 0 && (
+            <div class="app-info__row">
+              <dt>{t.legal.title}</dt>
+              <dd>
+                {legalKinds.map((kind, index) => (
+                  <>
+                    {index > 0 && ' · '}
+                    <a href={localizedPath({ key: 'legalDocument', app: app.slug, doc: kind }, locale)}>
+                      {t.legal.documents[kind]}
+                    </a>
+                  </>
+                ))}
+              </dd>
+            </div>
+          )
+        }
+      </dl>
+    </section>
 
-  <section class="app-info theme-light">
-    <dl class="container app-info__list">
-      {
-        info.map((row) => (
-          <div class="app-info__row">
-            <dt>{row.label}</dt>
-            <dd>
-              {row.href ? (
-                <a href={row.href} target="_blank" rel="noopener noreferrer">
-                  {row.value}
-                </a>
-              ) : (
-                row.value
-              )}
-            </dd>
-          </div>
-        ))
-      }
-      {
-        legalKinds.length > 0 && (
-          <div class="app-info__row">
-            <dt>{t.legal.title}</dt>
-            <dd>
-              {legalKinds.map((kind, index) => (
-                <>
-                  {index > 0 && ' · '}
-                  <a href={localizedPath({ key: 'legalDocument', app: app.slug, doc: kind }, locale)}>
-                    {t.legal.documents[kind]}
-                  </a>
-                </>
-              ))}
-            </dd>
-          </div>
-        )
-      }
-    </dl>
-  </section>
+  )}
 </BaseLayout>
 
 <style>
@@ -283,7 +307,72 @@ const info = [
     text-underline-offset: 3px;
   }
 
+  .app-hero--downloads {
+    padding-block: var(--space-64);
+  }
+
+  .app-hero--downloads .app-hero__title {
+    gap: var(--space-32);
+  }
+
+  .app-hero--downloads .app-hero__icon {
+    width: 9rem;
+    height: 9rem;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl);
+    box-shadow: none;
+  }
+
+  .app-hero--downloads .app-hero__tagline {
+    font-size: 1.5rem;
+  }
+
+  .app-hero__platforms, .app-hero__note {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+
   @media (max-width: 47.99rem) {
+    .app-hero--downloads {
+      padding-block: var(--space-48);
+    }
+
+    .app-hero--downloads .container {
+      padding-inline: var(--space-24);
+    }
+
+    .app-hero--downloads .app-hero__title {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-24);
+    }
+
+    .app-hero--downloads .app-hero__icon {
+      width: 5rem;
+      height: 5rem;
+    }
+
+    .app-hero--downloads .display {
+      font-size: 2.5rem;
+    }
+
+    .app-hero--downloads .app-hero__tagline {
+      font-size: 1.25rem;
+    }
+
+    .app-hero--downloads .app-hero__links {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .app-hero--downloads .btn {
+      max-width: 100%;
+      white-space: normal;
+      text-align: center;
+    }
+
+
     .app-hero__title {
       gap: 1.5rem;
     }

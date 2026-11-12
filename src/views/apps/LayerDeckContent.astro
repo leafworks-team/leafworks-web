@@ -1,0 +1,162 @@
+---
+import type { Locale } from '../../i18n/config';
+import { layerdeck, layerdeckDetail, layerdeckImages, layerdeckRequirements } from '../../data/apps/layerdeck';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+---
+
+<section class="layerdeck-about theme-light" aria-labelledby="layerdeck-heading">
+  <div class="container layerdeck-about__inner">
+    <h2 class="heading-2" id="layerdeck-heading">{layerdeckDetail.heading[locale]}</h2>
+    <p class="layerdeck-description">{layerdeck.description[locale]}</p>
+    <div class="layerdeck-gallery">
+      {layerdeckImages.map((file, index) => {
+        const feature = layerdeck.features[index];
+        const src = `/apps/layerdeck/${file}`;
+        return (
+          <figure>
+            <a href={src} target="_blank" rel="noopener noreferrer" aria-label={`${feature.title[locale]} ${layerdeckDetail.imageNote[locale]}`}>
+              <img src={src} width="2400" height="2000" loading="lazy" decoding="async" alt={`${feature.title[locale]} ${feature.body[locale]}`} />
+            </a>
+            <figcaption class:list={{ 'visually-hidden': locale === 'ko' }}>
+              <h3>{feature.title[locale]}</h3>
+              <p>{feature.body[locale]}</p>
+            </figcaption>
+          </figure>
+        );
+      })}
+    </div>
+  </div>
+</section>
+
+<section class="layerdeck-install theme-light" aria-labelledby="layerdeck-install-heading">
+  <div class="container layerdeck-install__inner">
+    <h2 class="heading-2" id="layerdeck-install-heading">{layerdeckDetail.installHeading[locale]}</h2>
+    <dl>
+      {layerdeckRequirements.map((row) => (
+        <div class="layerdeck-install__row">
+          <dt>{row.label[locale]}</dt>
+          <dd>{row.value[locale]}</dd>
+        </div>
+      ))}
+    </dl>
+    <p class="layerdeck-install__note">{layerdeckDetail.windowsNote[locale]}</p>
+  </div>
+</section>
+
+<style>
+  .layerdeck-about {
+    padding-block: var(--space-64);
+    background: var(--bg-subtle);
+  }
+
+  .layerdeck-about__inner {
+    display: grid;
+    gap: var(--space-48);
+  }
+
+  .layerdeck-description {
+    max-width: 62.5rem;
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+  }
+
+  .layerdeck-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-32);
+  }
+
+  figure {
+    margin: 0;
+    min-width: 0;
+  }
+
+  figure a {
+    display: block;
+  }
+
+  figure img {
+    width: 100%;
+    height: auto;
+  }
+
+  figcaption:not(.visually-hidden) {
+    display: grid;
+    gap: var(--space-8);
+    margin-top: var(--space-16);
+  }
+
+  figcaption h3 {
+    font-size: 1.125rem;
+  }
+
+  figcaption p {
+    color: var(--text-secondary);
+  }
+
+  .layerdeck-install {
+    padding-block: var(--space-64);
+  }
+
+  .layerdeck-install__inner {
+    display: grid;
+    gap: var(--space-32);
+  }
+
+  dl {
+    display: grid;
+    gap: var(--space-24);
+    margin: 0;
+  }
+
+  .layerdeck-install__row {
+    display: grid;
+    grid-template-columns: 11.25rem minmax(0, 1fr);
+    gap: var(--space-32);
+    font-size: 0.9375rem;
+  }
+
+  dt, .layerdeck-install__note {
+    color: var(--text-secondary);
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  .layerdeck-install__note {
+    font-size: 0.875rem;
+  }
+
+  @media (max-width: 47.99rem) {
+    .container {
+      padding-inline: var(--space-24);
+    }
+
+    .layerdeck-about, .layerdeck-install {
+      padding-block: var(--space-48);
+    }
+
+    .layerdeck-about__inner {
+      gap: var(--space-32);
+    }
+
+    .layerdeck-gallery {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-24);
+    }
+
+    .layerdeck-description {
+      font-size: 1rem;
+    }
+
+    .layerdeck-install__row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-8);
+    }
+
+  }
+</style>
