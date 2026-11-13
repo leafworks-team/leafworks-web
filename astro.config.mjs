@@ -9,7 +9,7 @@ export default defineConfig({
 
   // Static output. Cloudflare serves ./dist as plain files — no adapter, no
   // server runtime. React is only hydrated where a component asks for it
-  // (the app folder); everything else ships as HTML.
+  // (the product filters); everything else ships as HTML.
   output: 'static',
 
   integrations: [react()],
@@ -42,9 +42,9 @@ export default defineConfig({
     // checking the wrong address.
     server: { strictPort: true },
     // Pre-bundle the packages browser code imports. Otherwise Vite finds
-    // motion/react only when the apps folder first loads, re-bundles mid
+    // motion/react only when the product catalog first loads, re-bundles mid
     // session, and the open page keeps asking for the old bundle (504
-    // "Outdated Optimize Dep"), so the folder never hydrates and clicks do
+    // "Outdated Optimize Dep"), so the catalog never hydrates and clicks do
     // nothing in dev.
     optimizeDeps: {
       include: ['react', 'react-dom/client', 'motion/react', 'gsap', 'gsap/ScrollTrigger', 'gsap/SplitText'],

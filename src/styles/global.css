@@ -16,8 +16,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  /* Keep the scrollbar's space reserved. Locking scroll for the app folder
-     would otherwise remove it and shift the whole page mid-animation. */
+  /* Keep filtering from shifting the page when its scrollbar appears. */
   scrollbar-gutter: stable;
 }
 

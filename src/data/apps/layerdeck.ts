@@ -5,6 +5,7 @@ const downloadBase = 'https://cdn.crabnebula.app/download/leafworks/layerdeck/la
 export const layerdeck: App = {
   slug: 'layerdeck',
   name: 'LayerDeck',
+  productType: 'tools',
   icon: '/apps/layerdeck.svg',
   tagline: {
     ko: '키와 레이어를 원하는 대로 설정하세요.',
@@ -12,6 +13,24 @@ export const layerdeck: App = {
     ja: 'キーとレイヤーを好みに合わせて設定しましょう。',
   },
   summary: { ko: 'ZMK 키보드 도구', en: 'ZMK keyboard tool', ja: 'ZMKキーボードツール' },
+  card: {
+    headline: {
+      ko: '키와 레이어를 원하는 대로.',
+      en: 'Your keys and layers, your way.',
+      ja: 'キーとレイヤーを、好みのままに。',
+    },
+    description: {
+      ko: 'ZMK Studio 키보드를 USB로 연결해 키맵을 편집하고, 자주 쓰는 설정을 슬롯에 보관하세요.',
+      en: 'Connect your ZMK Studio keyboard over USB to edit keymaps and save your favorite setups in slots.',
+      ja: 'ZMK Studio対応キーボードをUSBで接続し、キーマップを編集。よく使う設定はスロットに保存できます。',
+    },
+    compactDescription: {
+      ko: 'ZMK 키보드의 키와 레이어를 바꾸고, 자주 쓰는 설정을 슬롯에 보관하세요.',
+      en: 'Change your ZMK keyboard’s keys and layers, and save your favorite setups in slots.',
+      ja: 'ZMKキーボードのキーとレイヤーを変更し、よく使う設定をスロットに保存できます。',
+    },
+    category: { ko: '키보드 · 생산성', en: 'Keyboards · Productivity', ja: 'キーボード · 作業効率' },
+  },
   description: {
     ko: 'LayerDeck은 ZMK Studio를 지원하는 키보드의 키맵을 편집하는 데스크톱 앱입니다. USB로 연결해 키와 레이어를 바꾸고, 자주 쓰는 키맵은 슬롯에 보관하세요. 키 테스트에서는 평소 쓰는 키맵 그대로 입력을 확인할 수 있습니다.',
     en: 'LayerDeck is a desktop keymap editor for keyboards that support ZMK Studio. Connect over USB to change keys and layers, and save your favorite keymaps in slots. Key test lets you check input using your usual keymap.',
